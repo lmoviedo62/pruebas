@@ -1,78 +1,269 @@
-{% extends "base.html" %}
-{% block title %}Iniciar sesión{% endblock %}
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow border-0 rounded-4">
-            <div class="card-body p-4">
-                <h2 class="text-center text-serena mb-4">Iniciar sesión en Serena</h2>
-                <form id="loginForm">
-  <label for="email">Correo institucional</label>
-  <input
-    id="email"
-    name="email"
-    type="email"
-    required
-    placeholder="usuario@ucatolica.edu.co"
-    pattern=".+@ucatolica\.edu\.co"
-    oninvalid="this.setCustomValidity('El correo debe ser institucional (@ucatolica.edu.co)')"
-    oninput="this.setCustomValidity('')"
-  />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Iniciar sesión - Serena</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+    }
 
-  <label for="password">Contraseña</label>
-  <input
-    id="password"
-    name="password"
-    type="password"
-    required
-    placeholder="Ingresa tu contraseña"
-  />
+    .top-bar {
+      width: 100%;
+      background: #908bdb;
+      color: #ffffff;
+      padding: 14px 0;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+    }
 
-  <button type="submit">Iniciar sesión</button>
+    .top-bar-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  <p id="loginError" style="color:red; margin-top: 8px;"></p>
-</form>
+    .top-bar-title {
+      font-weight: 700;
+      font-size: 18px;
+    }
 
-<script>
-  const form = document.getElementById("loginForm");
-  const errorBox = document.getElementById("loginError");
+    .top-bar-links {
+      font-size: 14px;
+      display: flex;
+      gap: 16px;
+    }
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    errorBox.textContent = "";
+    .top-bar-links a {
+      color: #f9fafb;
+      text-decoration: none;
+    }
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    .top-bar-links a:hover {
+      text-decoration: underline;
+    }
 
-    try {
-      const resp = await fetch("/api/v1/auth/login", {   // 👈 ajusta si tu prefijo es distinto
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    .page {
+      width: 100%;
+      max-width: 500px;
+      padding: 40px 20px;
+      margin: 0 auto;
+    }
 
-      const data = await resp.json();
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+      padding: 32px 40px 36px;
+    }
 
-      if (!resp.ok) {
-        // aquí llegan los mensajes del backend:
-        // "El correo debe ser institucional..."
-        // "Este correo no está registrado. Por favor regístrate primero."
-        // "Contraseña incorrecta."
-        errorBox.textContent = data.detail || "Error al iniciar sesión";
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 28px;
+      color: #1f2933;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: #374151;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus {
+      border-color: #908bdb;
+      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
+    }
+
+    small {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .btn-submit {
+      margin-top: 8px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #8b5cf6, #908bdb);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.15s ease;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.95;
+      box-shadow: 0 10px 24px rgba(148, 27, 147, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #loginError {
+      color: #dc2626;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .register-link a {
+      color: #8b5cf6;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="top-bar-inner">
+      <div class="top-bar-title">Serena</div>
+      <div class="top-bar-links">
+        <a href="/">Ingresar</a>
+        <a href="/register">Registro</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="card">
+      <h1>Iniciar sesión</h1>
+      <p class="subtitle">
+        Ingresa con tu correo institucional
+      </p>
+
+      <form id="loginForm">
+        <div>
+          <label for="email">Correo institucional</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            placeholder="usuario@ucatolica.edu.co"
+          />
+        </div>
+
+        <div>
+          <label for="password">Contraseña</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            placeholder="Ingresa tu contraseña"
+          />
+        </div>
+
+        <p id="loginError"></p>
+
+        <button type="submit" class="btn-submit" id="btnSubmit">Iniciar sesión</button>
+      </form>
+
+      <div class="register-link">
+        ¿No tienes cuenta? <a href="/register">Regístrate aquí</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const errorBox = document.getElementById("loginError");
+    const btnSubmit = document.getElementById("btnSubmit");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.textContent = "";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!email.endsWith("@ucatolica.edu.co")) {
+        errorBox.textContent = "El correo debe ser institucional (@ucatolica.edu.co)";
         return;
       }
 
-      // Login OK → redirigir al chat / dashboard
-      window.location.href = "/chatbot";  // o la ruta que tengas
-    } catch (err) {
-      console.error(err);
-      errorBox.textContent = "Error de conexión con el servidor.";
-    }
-  });
-</script>
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = "Iniciando sesión...";
 
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+      try {
+        const resp = await fetch("/api/v1/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          errorBox.textContent = data.detail || "Error al iniciar sesión";
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = "Iniciar sesión";
+          return;
+        }
+
+        // Guardar token (opcional para esta versión)
+        localStorage.setItem("token", data.access_token);
+        
+        // Redirigir al panel
+        window.location.href = "/panel";
+      } catch (err) {
+        console.error(err);
+        errorBox.textContent = "Error de conexión con el servidor.";
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Iniciar sesión";
+      }
+    });
+  </script>
+</body>
+</html>

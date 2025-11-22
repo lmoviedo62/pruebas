@@ -65,6 +65,27 @@ class EmailService:
         destinatario_bienestar = settings.SOS_EMAIL_DEST
         self._send_email(destinatario_bienestar, subject, body, reply_to=to_email)
 
+    def send_password_reset_email(self, to_email: str, nombre: str, reset_token: str) -> None:
+        """
+        🆕 Envía correo con enlace de recuperación de contraseña
+        """
+        subject = "Recuperación de contraseña - Serena 🔒"
+        
+        # URL del enlace de recuperación (ajusta según tu dominio)
+        reset_url = f"http://127.0.0.1:8000/reset-password?token={reset_token}"
+        
+        body = (
+            f"Hola {nombre},\n\n"
+            "Recibimos una solicitud para restablecer la contraseña de tu cuenta en Serena.\n\n"
+            "Para crear una nueva contraseña, haz clic en el siguiente enlace:\n"
+            f"{reset_url}\n\n"
+            "⚠️ Este enlace es válido por 1 hora.\n\n"
+            "Si no solicitaste este cambio, puedes ignorar este correo y tu contraseña permanecerá sin cambios.\n\n"
+            "Equipo Serena 💜\n"
+            "Universidad Católica de Colombia"
+        )
+        self._send_email(to_email, subject, body)
+
 
 # Instancia única (Singleton a nivel de módulo)
 email_service = EmailService()

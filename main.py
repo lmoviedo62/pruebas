@@ -15,7 +15,8 @@ Base.metadata.create_all(bind=engine)
 
 # IMPORTANTE: para la BD
 from app.db.session import engine
-from app.db.base_class import Base      # Base sin importar modelos aquí             # AQUI se importan los modelos sin causar circular import
+from app.db.base_class import Base
+from app.db import base
 
 
 app = FastAPI(title="Serena")
@@ -33,7 +34,6 @@ app.add_middleware(
 )
 
 # ----------- ESTÁTICOS Y TEMPLATES --------
-# OJO: ajusta la ruta si tus carpetas están dentro de app/frontend/*
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 templates = Jinja2Templates(directory="frontend/templates")
 
@@ -66,6 +66,16 @@ async def sos_page(request: Request):
 @app.get("/politica-privacidad", response_class=HTMLResponse)
 async def politicas_page(request: Request):
     return templates.TemplateResponse("politicas.html", {"request": request})
+
+# ✅ NUEVA RUTA: Página de recuperación de contraseña
+@app.get("/forgot-password", response_class=HTMLResponse)
+async def forgot_password_page(request: Request):
+    return templates.TemplateResponse("forgot_password.html", {"request": request})
+
+# ✅ NUEVA RUTA: Página de reseteo de contraseña (con token)
+@app.get("/reset-password", response_class=HTMLResponse)
+async def reset_password_page(request: Request):
+    return templates.TemplateResponse("reset_password.html", {"request": request})
 
 # ----------- API REST -------------------
 

@@ -30,7 +30,14 @@
                     </div>
                 </form>
 
+                <!-- Enlace para olvidé mi contraseña -->
                 <div class="text-center mt-3">
+                    <a href="/forgot-password" class="text-decoration-none" style="color: #7b2ff7; font-size: 14px;">
+                        🔒 ¿Olvidaste tu contraseña?
+                    </a>
+                </div>
+
+                <div class="text-center mt-2">
                     ¿Aún no tienes cuenta?
                     <a href="/register" class="text-serena fw-semibold">Registrarse</a>
                 </div>
@@ -38,4 +45,22 @@
         </div>
     </div>
 </div>
+
+<style>
+.text-serena {
+    color: #7b2ff7;
+}
+
+.btn-serena {
+    background-color: #7b2ff7;
+    border-color: #7b2ff7;
+    color: #fff;
+}
+
+.btn-serena:hover {
+    background-color: #5f22bd;
+    border-color: #5f22bd;
+    color: #fff;
+}
+</style>
 {% endblock %}

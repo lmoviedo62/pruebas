@@ -5,22 +5,22 @@ from passlib.context import CryptContext
 
 from app.core.config import settings
 
-# Contexto para hashear/verificar contraseñas
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Usar argon2 en lugar de bcrypt
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifica que la contraseña en texto plano coincida con el hash guardado."""
+    """Verifica que la contraseña coincida con el hash"""
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    """Genera el hash seguro de la contraseña."""
+    """Genera el hash de la contraseña usando argon2"""
     return pwd_context.hash(password)
 
 
 def create_access_token(data: dict, expires_minutes: int | None = None) -> str:
-    """Crea un JWT de acceso con expiración."""
+    """Crea un JWT de acceso con expiración"""
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=expires_minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES
@@ -36,7 +36,7 @@ def create_access_token(data: dict, expires_minutes: int | None = None) -> str:
 
 
 def decode_token(token: str) -> dict | None:
-    """Decodifica el token JWT. Devuelve el payload o None si es inválido."""
+    """Decodifica el token JWT"""
     try:
         payload = jwt.decode(
             token,

@@ -10,7 +10,6 @@
       background: #ffffff;
     }
 
-    /* Barra superior lila */
     .top-bar {
       width: 100%;
       background: #908bdb;
@@ -48,7 +47,6 @@
       text-decoration: underline;
     }
 
-    /* Contenido principal */
     .page {
       width: 100%;
       max-width: 900px;
@@ -114,9 +112,23 @@
       box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.15);
     }
 
+    input.error {
+      border-color: #dc2626;
+    }
+
+    input.success {
+      border-color: #10b981;
+    }
+
     small {
       font-size: 11px;
       color: #6b7280;
+      display: block;
+      margin-top: 4px;
+    }
+
+    small.error {
+      color: #dc2626;
     }
 
     .checkbox-row {
@@ -132,10 +144,14 @@
 
     .checkbox-row input[type="checkbox"] {
       margin: 0;
+      width: auto;
     }
 
     #registroError {
       grid-column: 1 / -1;
+      color: #dc2626;
+      font-size: 13px;
+      text-align: center;
     }
 
     .btn-submit {
@@ -163,6 +179,11 @@
       box-shadow: none;
     }
 
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     @media (max-width: 720px) {
       .card {
         padding: 20px 18px 24px;
@@ -175,7 +196,6 @@
   </style>
 </head>
 <body>
-  <!-- barra superior -->
   <div class="top-bar">
     <div class="top-bar-inner">
       <div class="top-bar-title">Serena</div>
@@ -186,7 +206,6 @@
     </div>
   </div>
 
-  <!-- contenido -->
   <div class="page">
     <div class="card">
       <h1>Registro en Serena</h1>
@@ -205,10 +224,8 @@
             required
             placeholder="usuario@ucatolica.edu.co"
             pattern="^[a-zA-Z0-9._%+-]+@ucatolica\.edu\.co$"
-            onblur="validarCorreo()"
-            oninput="this.setCustomValidity('')"
           />
-          <small id="email-error" style="color: #dc2626; font-size: 12px;"></small>
+          <small id="email-error" class="error"></small>
         </div>
 
         <!-- Identificación -->
@@ -221,7 +238,9 @@
             inputmode="numeric"
             pattern="^[0-9]+$"
             required
+            placeholder="Solo números"
           />
+          <small id="id-error" class="error"></small>
         </div>
 
         <!-- Nombre -->
@@ -233,7 +252,9 @@
             type="text"
             required
             pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+            placeholder="Solo letras"
           />
+          <small id="nombre-error" class="error"></small>
         </div>
 
         <!-- Apellido -->
@@ -245,7 +266,9 @@
             type="text"
             required
             pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+            placeholder="Solo letras"
           />
+          <small id="apellido-error" class="error"></small>
         </div>
 
         <!-- Programa / Carrera -->
@@ -298,7 +321,9 @@
             maxlength="10"
             pattern="^[0-9]{10}$"
             required
+            placeholder="10 dígitos"
           />
+          <small id="tel-error" class="error"></small>
         </div>
 
         <!-- Contraseña -->
@@ -310,8 +335,9 @@
             type="password"
             required
             minlength="8"
+            placeholder="Mínimo 8 caracteres"
           />
-          <small>Mínimo 8 caracteres, mezcla letras, números y caracteres especiales.</small>
+          <small id="pass-error">Mínimo 8 caracteres, mezcla letras, números y caracteres especiales.</small>
         </div>
 
         <!-- Autorización datos -->
@@ -325,112 +351,250 @@
             />
             <span>
               Autorizo el tratamiento de mis datos según la
-              <a href="/politicas" target="_blank">política de privacidad</a>.
+              <a href="/politica-privacidad" target="_blank">política de privacidad</a>.
             </span>
           </label>
         </div>
 
-        <p id="registroError" class="full-row" style="color: #dc2626; font-size: 13px;"></p>
+        <p id="registroError"></p>
 
-        <button type="submit" class="btn-submit">Registrarme</button>
+        <button type="submit" class="btn-submit" id="btnSubmit">Registrarme</button>
       </form>
     </div>
   </div>
 
   <script>
-    // -------- validación de correo ----------
-    function validarCorreo() {
-      const email = document.getElementById("email");
-      const error = document.getElementById("email-error");
+    // ============ VALIDACIONES EN TIEMPO REAL ============
+    
+    const emailInput = document.getElementById("email");
+    const emailError = document.getElementById("email-error");
+    
+    const idInput = document.getElementById("identificacion");
+    const idError = document.getElementById("id-error");
+    
+    const nombreInput = document.getElementById("nombre");
+    const nombreError = document.getElementById("nombre-error");
+    
+    const apellidoInput = document.getElementById("apellido");
+    const apellidoError = document.getElementById("apellido-error");
+    
+    const telInput = document.getElementById("telefono");
+    const telError = document.getElementById("tel-error");
+    
+    const passInput = document.getElementById("password");
+    const passError = document.getElementById("pass-error");
+
+    // Validar EMAIL - Solo @ucatolica.edu.co
+    emailInput.addEventListener("blur", function() {
       const regex = /^[a-zA-Z0-9._%+-]+@ucatolica\.edu\.co$/;
-
-      if (!regex.test(email.value)) {
-        error.textContent = "Debes usar tu correo institucional @ucatolica.edu.co";
-        email.style.borderColor = "#dc2626";
+      if (!regex.test(this.value)) {
+        emailError.textContent = "Debe ser correo institucional @ucatolica.edu.co";
+        this.classList.add("error");
+        this.classList.remove("success");
       } else {
-        error.textContent = "";
-        email.style.borderColor = "#10b981";
+        emailError.textContent = "";
+        this.classList.remove("error");
+        this.classList.add("success");
       }
-    }
+    });
 
-    // -------- restricciones de entrada ----------
-  const identInput = document.getElementById("identificacion");
-  const telInput = document.getElementById("telefono");
-  const nombreInput = document.getElementById("nombre");
-  const apellidoInput = document.getElementById("apellido");
+    // Validar IDENTIFICACIÓN - Solo números
+    idInput.addEventListener("input", function() {
+      this.value = this.value.replace(/[^0-9]/g, "");
+      if (this.value.length > 0 && this.value.length < 6) {
+        idError.textContent = "Mínimo 6 dígitos";
+        this.classList.add("error");
+      } else {
+        idError.textContent = "";
+        this.classList.remove("error");
+        if (this.value.length >= 6) this.classList.add("success");
+      }
+    });
 
-  identInput.addEventListener("input", function () {
-    this.value = this.value.replace(/[^0-9]/g, "");
-  });
+    // Validar NOMBRE - Solo letras
+    nombreInput.addEventListener("input", function() {
+      this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+      if (this.value.length > 0 && this.value.length < 2) {
+        nombreError.textContent = "Mínimo 2 letras";
+        this.classList.add("error");
+      } else {
+        nombreError.textContent = "";
+        this.classList.remove("error");
+        if (this.value.length >= 2) this.classList.add("success");
+      }
+    });
 
-  telInput.addEventListener("input", function () {
-    this.value = this.value.replace(/[^0-9]/g, "").slice(0, 10);
-  });
+    // Validar APELLIDO - Solo letras
+    apellidoInput.addEventListener("input", function() {
+      this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+      if (this.value.length > 0 && this.value.length < 2) {
+        apellidoError.textContent = "Mínimo 2 letras";
+        this.classList.add("error");
+      } else {
+        apellidoError.textContent = "";
+        this.classList.remove("error");
+        if (this.value.length >= 2) this.classList.add("success");
+      }
+    });
 
-  nombreInput.addEventListener("input", function () {
-    this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
-  });
+    // Validar TELÉFONO - Solo 10 dígitos
+    telInput.addEventListener("input", function() {
+      this.value = this.value.replace(/[^0-9]/g, "").slice(0, 10);
+      if (this.value.length > 0 && this.value.length < 10) {
+        telError.textContent = `Faltan ${10 - this.value.length} dígitos`;
+        this.classList.add("error");
+      } else if (this.value.length === 10) {
+        telError.textContent = "";
+        this.classList.remove("error");
+        this.classList.add("success");
+      }
+    });
 
-  apellidoInput.addEventListener("input", function () {
-    this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
-  });
+    // Validar CONTRASEÑA - Mínimo 8 caracteres con letras, números y especiales
+    passInput.addEventListener("input", function() {
+      const hasLetter = /[a-zA-Z]/.test(this.value);
+      const hasNumber = /[0-9]/.test(this.value);
+      const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(this.value);
+      const isLongEnough = this.value.length >= 8;
 
-  // --- Manejo del submit y envío al backend ---
-  const form = document.getElementById("registroForm");
-  const errorBox = document.getElementById("registroError");
+      if (!isLongEnough) {
+        passError.textContent = "Mínimo 8 caracteres";
+        passError.classList.add("error");
+        this.classList.add("error");
+      } else if (!hasLetter || !hasNumber || !hasSpecial) {
+        passError.textContent = "Debe incluir letras, números y caracteres especiales";
+        passError.classList.add("error");
+        this.classList.add("error");
+      } else {
+        passError.textContent = "✓ Contraseña segura";
+        passError.classList.remove("error");
+        this.classList.remove("error");
+        this.classList.add("success");
+      }
+    });
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    errorBox.textContent = "";
+    // ============ ENVÍO DEL FORMULARIO ============
+    
+    const form = document.getElementById("registroForm");
+    const errorBox = document.getElementById("registroError");
+    const btnSubmit = document.getElementById("btnSubmit");
 
-    // Validación HTML5
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.textContent = "";
 
-    // Captura de campos
-    const email = document.getElementById("email").value.trim();
-    const nombre = document.getElementById("nombre").value.trim();
-    const apellido = document.getElementById("apellido").value.trim();
-    const identificacion = document.getElementById("identificacion").value.trim();
-    const programa = document.getElementById("programa").value;
-    const semestre = document.getElementById("semestre").value;
-    const telefono = document.getElementById("telefono").value.trim();
-    const password = document.getElementById("password").value;
+      // Validación final antes de enviar
+      const email = emailInput.value.trim();
+      const identificacion = idInput.value.trim();
+      const nombre = nombreInput.value.trim();
+      const apellido = apellidoInput.value.trim();
+      const telefono = telInput.value.trim();
+      const password = passInput.value;
+      const programa = document.getElementById("programa").value;
+      const semestre = document.getElementById("semestre").value;
 
-    // Payload EXACTO que espera el backend
-    const payload = {
-      email: email,
-      full_name: `${nombre} ${apellido}`,
-      password: password,
-      identificacion: identificacion,
-      nombre: nombre,
-      apellido: apellido,
-      programa: programa,
-      semestre: parseInt(semestre),
-      telefono: telefono
-    };
-
-    try {
-      const resp = await fetch("/api/v1/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await resp.json();
-
-      if (!resp.ok) {
-        errorBox.textContent = data.detail || "Error al registrarse.";
+      // Validar correo
+      if (!email.endsWith("@ucatolica.edu.co")) {
+        errorBox.textContent = "El correo debe ser institucional @ucatolica.edu.co";
+        emailInput.focus();
         return;
       }
 
-      // Registro correcto
-      window.location.href = "/panel";
-    } catch (err) {
-      console.error(err);
-      errorBox.textContent = "Error de conexión con el servidor.";
-    }
-  });
-</script>
+      // Validar identificación
+      if (!/^[0-9]{6,}$/.test(identificacion)) {
+        errorBox.textContent = "La identificación debe tener mínimo 6 dígitos numéricos";
+        idInput.focus();
+        return;
+      }
+
+      // Validar nombre
+      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,}$/.test(nombre)) {
+        errorBox.textContent = "El nombre solo debe contener letras";
+        nombreInput.focus();
+        return;
+      }
+
+      // Validar apellido
+      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,}$/.test(apellido)) {
+        errorBox.textContent = "El apellido solo debe contener letras";
+        apellidoInput.focus();
+        return;
+      }
+
+      // Validar teléfono
+      if (!/^[0-9]{10}$/.test(telefono)) {
+        errorBox.textContent = "El teléfono debe tener exactamente 10 dígitos";
+        telInput.focus();
+        return;
+      }
+
+      // Validar contraseña
+      const hasLetter = /[a-zA-Z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+      const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+      
+      if (password.length < 8) {
+        errorBox.textContent = "La contraseña debe tener mínimo 8 caracteres";
+        passInput.focus();
+        return;
+      }
+      
+      if (!hasLetter || !hasNumber || !hasSpecial) {
+        errorBox.textContent = "La contraseña debe incluir letras, números y caracteres especiales";
+        passInput.focus();
+        return;
+      }
+
+      // Validar checkbox
+      if (!document.getElementById("acepto_datos").checked) {
+        errorBox.textContent = "Debes aceptar la política de privacidad";
+        return;
+      }
+
+      // Deshabilitar botón mientras se procesa
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = "Registrando...";
+
+      // Preparar datos para enviar
+      const payload = {
+        email: email,
+        full_name: `${nombre} ${apellido}`,
+        password: password,
+        identificacion: identificacion,
+        nombre: nombre,
+        apellido: apellido,
+        programa: programa,
+        semestre: parseInt(semestre),
+        telefono: telefono
+      };
+
+      try {
+        const resp = await fetch("/api/v1/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          errorBox.textContent = data.detail || "Error al registrarse. Por favor intenta de nuevo.";
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = "Registrarme";
+          return;
+        }
+
+        // Registro exitoso
+        alert("¡Registro exitoso! Ahora serás redirigido al panel.");
+        window.location.href = "/panel";
+        
+      } catch (err) {
+        console.error("Error completo:", err);
+        errorBox.textContent = "Error de conexión con el servidor. Por favor intenta de nuevo.";
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Registrarme";
+      }
+    });
+  </script>
+</body>
+</html>

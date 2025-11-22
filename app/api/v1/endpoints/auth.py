@@ -1,12 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+import secrets
 
 from app.db.session import get_db
 from app.schemas.user import UserCreate, UserOut, UserLogin
 from app.repositories.user_repository import UserRepository
+from app.services.email import email_service
+from app.core.security import get_password_hash, verify_password
+from app.models.user import User
 
-# ❌ ANTES: router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
-# ✅ AHORA:
 router = APIRouter(tags=["auth"])
 
 
@@ -24,3 +27,132 @@ def register_user(usuario_in: UserCreate, db: Session = Depends(get_db)):
 
     user = repo.create(usuario_in)
     return user
+
+
+@router.post("/forgot-password")
+def forgot_password(
+    email: str = Query(..., description="Correo institucional del usuario"),
+    db: Session = Depends(get_db)
+):
+    """
+    Endpoint para solicitar recuperación de contraseña.
+    Genera un token único y envía el correo con el enlace de reseteo.
+    """
+    # Validar que sea correo institucional
+    if not email.endswith("@ucatolica.edu.co"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El correo debe ser institucional (@ucatolica.edu.co)"
+        )
+    
+    # Buscar usuario por email
+    user = db.query(User).filter(User.email == email).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Este correo no está registrado. Por favor regístrate primero."
+        )
+    
+    # Generar token único de recuperación (32 caracteres seguros)
+    reset_token = secrets.token_urlsafe(32)
+    
+    # Guardar token y fecha de expiración en la BD (1 hora de validez)
+    user.reset_token = reset_token
+    user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+    db.commit()
+    
+    # Enviar correo con el enlace de recuperación
+    try:
+        email_service.send_password_reset_email(
+            to_email=user.email,
+            nombre=user.nombre,
+            reset_token=reset_token
+        )
+    except Exception as e:
+        print(f"Error al enviar correo: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error al enviar el correo. Por favor intenta más tarde."
+        )
+    
+    return {
+        "message": f"Se ha enviado un correo a {email} con instrucciones para recuperar tu contraseña."
+    }
+
+
+@router.post("/reset-password")
+def reset_password(
+    token: str = Query(..., description="Token de recuperación"),
+    new_password: str = Query(..., min_length=8, description="Nueva contraseña"),
+    db: Session = Depends(get_db)
+):
+    """
+    Endpoint para restablecer la contraseña usando el token enviado por correo.
+    """
+    # Buscar usuario con el token válido
+    user = db.query(User).filter(
+        User.reset_token == token,
+        User.reset_token_expires > datetime.utcnow()
+    ).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token inválido o expirado. Solicita un nuevo enlace de recuperación."
+        )
+    
+    # Actualizar contraseña
+    user.hashed_password = get_password_hash(new_password)
+    
+    # Limpiar token de recuperación
+    user.reset_token = None
+    user.reset_token_expires = None
+    
+    db.commit()
+    
+    return {
+        "message": "Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva contraseña."
+    }
+
+
+@router.post("/login")
+def login(
+    credentials: UserLogin,
+    db: Session = Depends(get_db)
+):
+    """
+    Endpoint de login (placeholder - debes implementar la lógica completa con JWT)
+    """
+    # Validar correo institucional
+    if not credentials.email.endswith("@ucatolica.edu.co"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El correo debe ser institucional (@ucatolica.edu.co)"
+        )
+    
+    # Buscar usuario
+    user = db.query(User).filter(User.email == credentials.email).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Este correo no está registrado. Por favor regístrate primero."
+        )
+    
+    # Verificar contraseña
+    if not verify_password(credentials.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Contraseña incorrecta."
+        )
+    
+    # Aquí deberías generar el JWT token
+    # Por ahora retornamos un mensaje simple
+    return {
+        "message": "Login exitoso",
+        "user": {
+            "email": user.email,
+            "nombre": user.nombre
+        }
+    }

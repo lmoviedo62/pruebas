@@ -1,40 +1,368 @@
-{% extends "base.html" %}
-{% block title %}Chat de apoyo{% endblock %}
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow border-0 rounded-4">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="text-serena mb-0">Chat de apoyo (Serena)</h3>
-                    <a href="/" class="btn btn-outline-secondary btn-sm">Cerrar sesión</a>
-                </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat de apoyo - Serena</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-                <p class="text-muted">
-                    Selecciona cómo te sientes hoy y luego elige si deseas un consejo, una meditación
-                    o un ejercicio de respiración. También puedes escribir libremente.
-                </p>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f7ebff;
+      min-height: 100vh;
+    }
 
-                <div class="btn-group mb-3 flex-wrap" role="group">
-                    <button class="btn btn-outline-danger emotion-btn" data-emotion="muy_mal">Muy mal</button>
-                    <button class="btn btn-outline-warning emotion-btn" data-emotion="triste">Triste</button>
-                    <button class="btn btn-outline-secondary emotion-btn" data-emotion="neutral">Neutral</button>
-                    <button class="btn btn-outline-success emotion-btn" data-emotion="bien">Bien</button>
-                    <button class="btn btn-outline-primary emotion-btn" data-emotion="muy_bien">Muy bien</button>
-                </div>
+    /* Navbar superior */
+    .navbar {
+      background: linear-gradient(90deg, #8b5cf6, #a855f7);
+      padding: 12px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 
-                <textarea id="chat-area" class="form-control mb-3" rows="8" readonly>
-Bienvenido(a), soy Serena. Cuéntame cómo te sientes hoy y buscaremos juntos una estrategia de autocuidado.</textarea>
+    .navbar-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-                <div class="mb-3">
-                    <label class="form-label">Escribe tu respuesta o cómo te sientes...</label>
-                    <input type="text" id="chat-input" class="form-control">
-                </div>
-                <div class="d-flex justify-content-end">
-                    <button id="chat-send" class="btn btn-serena">Enviar</button>
-                </div>
-            </div>
-        </div>
+    .navbar-brand {
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .navbar-links a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      transition: opacity 0.2s;
+    }
+
+    .navbar-links a:hover {
+      opacity: 0.8;
+    }
+
+    /* Contenedor principal */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    /* Card del chat */
+    .chat-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 32px;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f3f4f6;
+    }
+
+    .chat-title {
+      font-size: 24px;
+      color: #8b5cf6;
+      font-weight: 600;
+    }
+
+    .btn-close {
+      padding: 8px 16px;
+      background: white;
+      color: #6b7280;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-close:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    /* Descripción */
+    .description {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    /* Botones de emociones */
+    .emotion-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .emotion-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 2px solid;
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .emotion-btn.muy-mal {
+      color: #dc2626;
+      border-color: #dc2626;
+    }
+
+    .emotion-btn.muy-mal:hover {
+      background: #fee2e2;
+    }
+
+    .emotion-btn.triste {
+      color: #f59e0b;
+      border-color: #f59e0b;
+    }
+
+    .emotion-btn.triste:hover {
+      background: #fef3c7;
+    }
+
+    .emotion-btn.neutral {
+      color: #6b7280;
+      border-color: #6b7280;
+    }
+
+    .emotion-btn.neutral:hover {
+      background: #f3f4f6;
+    }
+
+    .emotion-btn.bien {
+      color: #10b981;
+      border-color: #10b981;
+    }
+
+    .emotion-btn.bien:hover {
+      background: #d1fae5;
+    }
+
+    .emotion-btn.muy-bien {
+      color: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .emotion-btn.muy-bien:hover {
+      background: #dbeafe;
+    }
+
+    /* Área de chat */
+    .chat-area {
+      width: 100%;
+      min-height: 300px;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #374151;
+      resize: vertical;
+      margin-bottom: 20px;
+      font-family: inherit;
+      background: #f9fafb;
+    }
+
+    .chat-area:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      background: white;
+    }
+
+    /* Input de mensaje */
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .chat-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+
+    /* Botón enviar */
+    .send-container {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-send {
+      padding: 12px 32px;
+      background: linear-gradient(135deg, #8b5cf6, #a855f7);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-send:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-send:active {
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .emotion-buttons {
+        flex-direction: column;
+      }
+
+      .emotion-btn {
+        width: 100%;
+      }
+
+      .chat-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <a href="/" class="navbar-brand">Serena</a>
+      <div class="navbar-links">
+        <a href="/panel">Panel</a>
+        <a href="/chat">Chat</a>
+        <a href="/sos">Recursos</a>
+      </div>
     </div>
-</div>
-{% endblock %}
+  </nav>
+
+  <!-- Contenido principal -->
+  <div class="container">
+    <div class="chat-card">
+      <!-- Header -->
+      <div class="chat-header">
+        <h2 class="chat-title">Chat de apoyo (Serena)</h2>
+        <a href="/panel" class="btn-close">← Volver al panel</a>
+      </div>
+
+      <!-- Descripción -->
+      <p class="description">
+        Selecciona cómo te sientes hoy y luego elige si deseas un consejo, una meditación
+        o un ejercicio de respiración. También puedes escribir libremente.
+      </p>
+
+      <!-- Botones de emociones -->
+      <div class="emotion-buttons">
+        <button class="emotion-btn muy-mal" data-emotion="muy_mal">😢 Muy mal</button>
+        <button class="emotion-btn triste" data-emotion="triste">😔 Triste</button>
+        <button class="emotion-btn neutral" data-emotion="neutral">😐 Neutral</button>
+        <button class="emotion-btn bien" data-emotion="bien">🙂 Bien</button>
+        <button class="emotion-btn muy-bien" data-emotion="muy_bien">😊 Muy bien</button>
+      </div>
+
+      <!-- Área de conversación -->
+      <textarea id="chat-area" class="chat-area" readonly>Bienvenido(a), soy Serena. Cuéntame cómo te sientes hoy y buscaremos juntos una estrategia de autocuidado.</textarea>
+
+      <!-- Input de mensaje -->
+      <div class="input-group">
+        <label class="input-label">Escribe tu respuesta o cómo te sientes...</label>
+        <input type="text" id="chat-input" class="chat-input" placeholder="Escribe aquí...">
+      </div>
+
+      <!-- Botón enviar -->
+      <div class="send-container">
+        <button id="chat-send" class="btn-send">Enviar mensaje</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const emotionButtons = document.querySelectorAll(".emotion-btn");
+    const chatArea = document.getElementById("chat-area");
+    const chatInput = document.getElementById("chat-input");
+    const chatSend = document.getElementById("chat-send");
+
+    const messages = {
+      muy_mal: "Gracias por contarme que te sientes muy mal. Te propongo hacer un ejercicio de respiración para bajar un poco la intensidad de la emoción.",
+      triste: "Entiendo que te sientas triste. A veces hablar de lo que nos pasa ayuda a ordenar las ideas.",
+      neutral: "Estar neutral también es una emoción válida. Podemos explorar qué ha pasado en tu día.",
+      bien: "¡Qué bueno que te sientas bien! Podemos pensar en estrategias para mantener ese bienestar.",
+      muy_bien: "Me alegra mucho que te sientas muy bien. Aprovechemos para reforzar tus recursos personales."
+    };
+
+    emotionButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const emotion = btn.dataset.emotion;
+        chatArea.value += "\n\n[Serena] " + messages[emotion];
+        chatArea.scrollTop = chatArea.scrollHeight;
+      });
+    });
+
+    function sendMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      
+      chatArea.value += "\n\n[Tú] " + text;
+      chatArea.value += "\n\n[Serena] Gracias por compartirlo. Recuerda hacer una pausa, respirar profundo y, si lo necesitas, contactar a Bienestar Universitario.";
+      chatArea.scrollTop = chatArea.scrollHeight;
+      chatInput.value = "";
+    }
+
+    chatSend.addEventListener("click", sendMessage);
+    
+    chatInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>

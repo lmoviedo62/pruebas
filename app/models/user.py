@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from app.db.base_class import Base
 
 
 class User(Base):
-    __tablename__ = "users"   # 🔥 ESTA LÍNEA ES OBLIGATORIA
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
@@ -18,3 +18,7 @@ class User(Base):
     telefono = Column(String(20), nullable=False)
 
     is_active = Column(Boolean, default=True)
+    
+    # 🆕 Campos para recuperación de contraseña
+    reset_token = Column(String(255), nullable=True, unique=True)
+    reset_token_expires = Column(DateTime, nullable=True)
