@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="text-center mb-3 text-serena fw-bold">¡Bienvenido(a) a Serena!</h1>
+                <p class="text-center text-muted mb-4">
+                    Hola, soy Serena y estoy aquí para acompañarte. Esta aplicación está pensada
+                    para brindar <strong>primeros auxilios emocionales</strong> a estudiantes de la
+                    <strong>Universidad Católica de Colombia</strong>.
+                </p>
+
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label class="form-label">Correo institucional</label>
+                        <input type="email" class="form-control" id="login-email"
+                               placeholder="usuario@ucatolica.edu.co" required>
+                        <div class="form-text">Debe ser un correo @ucatolica.edu.co</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="login-password"
+                               placeholder="Ingresa tu contraseña" minlength="8" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-serena">Iniciar sesión</button>
+                        <a href="/sos" class="btn btn-danger">Ayuda inmediata</a>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    ¿Aún no tienes cuenta?
+                    <a href="/register" class="text-serena fw-semibold">Registrarse</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

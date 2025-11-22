@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Ayuda inmediata{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-4">
+                <h3 class="text-danger mb-3">Ayuda inmediata</h3>
+                <p>
+                    Si estás viviendo una <strong>emergencia</strong> o sientes que corres peligro,
+                    comunícate de inmediato a las siguientes líneas antes de continuar usando Serena.
+                </p>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Línea Nacional de Emergencias
+                        <span class="badge bg-danger rounded-pill">123</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Bienestar Universitario
+                        <span class="badge bg-primary rounded-pill">bienestar@ucatolica.edu.co</span>
+                    </li>
+                </ul>
+                <p class="mb-0 text-muted small">
+                    Recuerda: Serena es una herramienta de acompañamiento académico y no reemplaza
+                    la atención psicológica profesional ni los servicios de urgencias.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

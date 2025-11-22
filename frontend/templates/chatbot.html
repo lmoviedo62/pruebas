@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Chat de apoyo{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="text-serena mb-0">Chat de apoyo (Serena)</h3>
+                    <a href="/" class="btn btn-outline-secondary btn-sm">Cerrar sesión</a>
+                </div>
+
+                <p class="text-muted">
+                    Selecciona cómo te sientes hoy y luego elige si deseas un consejo, una meditación
+                    o un ejercicio de respiración. También puedes escribir libremente.
+                </p>
+
+                <div class="btn-group mb-3 flex-wrap" role="group">
+                    <button class="btn btn-outline-danger emotion-btn" data-emotion="muy_mal">Muy mal</button>
+                    <button class="btn btn-outline-warning emotion-btn" data-emotion="triste">Triste</button>
+                    <button class="btn btn-outline-secondary emotion-btn" data-emotion="neutral">Neutral</button>
+                    <button class="btn btn-outline-success emotion-btn" data-emotion="bien">Bien</button>
+                    <button class="btn btn-outline-primary emotion-btn" data-emotion="muy_bien">Muy bien</button>
+                </div>
+
+                <textarea id="chat-area" class="form-control mb-3" rows="8" readonly>
+Bienvenido(a), soy Serena. Cuéntame cómo te sientes hoy y buscaremos juntos una estrategia de autocuidado.</textarea>
+
+                <div class="mb-3">
+                    <label class="form-label">Escribe tu respuesta o cómo te sientes...</label>
+                    <input type="text" id="chat-input" class="form-control">
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button id="chat-send" class="btn btn-serena">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

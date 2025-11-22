@@ -1,0 +1,29 @@
+body.bg-serena {
+    background: #f4e9ff;
+}
+
+.text-serena {
+    color: #7b2ff7;
+}
+
+.btn-serena {
+    background-color: #7b2ff7;
+    border-color: #7b2ff7;
+    color: #fff;
+}
+
+.btn-serena:hover {
+    background-color: #5f22bd;
+    border-color: #5f22bd;
+    color: #fff;
+}
+
+.btn-outline-serena {
+    color: #7b2ff7;
+    border-color: #7b2ff7;
+}
+
+.btn-outline-serena:hover {
+    background-color: #7b2ff7;
+    color: #fff;
+}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Panel{% endblock %}
+{% block content %}
+<div class="alert alert-success">
+    Ingreso exitoso. Bienvenido(a) a Serena.
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Chat de apoyo</h5>
+                <p class="card-text">
+                    Inicia una conversación con Serena para recibir apoyo emocional básico y ejercicios de respiración.
+                </p>
+                <a href="/chat" class="btn btn-serena">Ir al chat</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Diario emocional (demo)</h5>
+                <p class="card-text">
+                    Maqueta de cómo se vería el CRUD de entradas de diario asociadas al usuario.
+                </p>
+                <a href="/chat" class="btn btn-outline-serena">Ver diario</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5 class="card-title">Recursos de ayuda</h5>
+                <p class="card-text">
+                    Información de líneas de ayuda y contactos de Bienestar Universitario.
+                </p>
+                <a href="/sos" class="btn btn-outline-danger">Ver recursos</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
