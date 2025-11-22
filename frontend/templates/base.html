@@ -15,7 +15,7 @@
 
     <style>
         body {
-            background-color: #f7ebff; /* lila clarito de fondo */
+            background-color: #f7ebff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -36,17 +36,45 @@
             opacity: 0.9;
         }
 
-        .btn-sos {
-            background-color: #e11d48;
-            border-color: #e11d48;
-            color: #fff;
-            font-weight: 600;
+        /* Sección de usuario en navbar */
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
-        .btn-sos:hover {
-            background-color: #be123c;
-            border-color: #be123c;
-            color: #fff;
+        .user-email {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .btn-logout {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #ffffff;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-logout:active {
+            transform: translateY(0);
         }
 
         /* Contenedor principal para centrar las vistas */
@@ -55,17 +83,64 @@
             padding-top: 2rem;
             padding-bottom: 2rem;
         }
+
+        /* Ocultar elementos por defecto */
+        .d-none-custom {
+            display: none !important;
+        }
+
+        /* Forzar display flex cuando está visible */
+        .user-section {
+            display: none;
+        }
+
+        .user-section:not(.d-none-custom) {
+            display: flex !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .user-email {
+                display: none;
+            }
+            
+            .navbar-serena .container {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 
     {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-<!-- NAVBAR SUPERIOR (solo logo) -->
+<!-- NAVBAR SUPERIOR -->
 <header>
-    <nav class="navbar navbar-serena shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-serena shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="/">Serena</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav"
+                    aria-expanded="false" aria-label="Toggle navigation"
+                    style="border-color: rgba(255,255,255,0.3);">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto">
+                    <!-- Sección de usuario logueado (oculta por defecto) -->
+                    <div id="user-section" class="user-section d-none-custom">
+                        <button class="btn btn-logout" id="logout-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+                            </svg>
+                            Cerrar sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 </header>
@@ -77,7 +152,7 @@
     </div>
 </main>
 
-<!-- FOOTER SIMPLE (opcional) -->
+<!-- FOOTER SIMPLE -->
 <footer class="text-center text-muted py-3 small">
     Serena · Apoyo emocional para estudiantes de la Universidad Católica de Colombia
 </footer>
@@ -88,6 +163,86 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"
 ></script>
+
+<!-- Script de autenticación -->
+<script>
+// Ejecutar inmediatamente, no esperar DOMContentLoaded
+(function() {
+    // Función para verificar si el usuario está logueado
+    function checkAuth() {
+        const token = localStorage.getItem('token');
+        const userEmail = localStorage.getItem('user_email');
+
+        const userSection = document.getElementById('user-section');
+
+        if (userSection && token && userEmail) {
+            // Usuario está logueado
+            userSection.classList.remove('d-none-custom');
+            userSection.style.display = 'flex';
+        } else {
+            // Usuario no está logueado
+            if (userSection) {
+                userSection.classList.add('d-none-custom');
+            }
+        }
+    }
+
+    // Ejecutar inmediatamente
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    } else {
+        checkAuth();
+    }
+
+    // También ejecutar después de un pequeño delay por si acaso
+    setTimeout(checkAuth, 100);
+
+    // Event listener para el botón de logout
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Confirmar antes de cerrar sesión
+                if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                    logout();
+                }
+            });
+        }
+    });
+
+    // Función para cerrar sesión
+    async function logout() {
+        const token = localStorage.getItem('token');
+        
+        if (token) {
+            try {
+                // Llamar al endpoint de logout
+                await fetch('/api/v1/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (err) {
+                console.error('Error al cerrar sesión en el servidor:', err);
+            }
+        }
+        
+        // Limpiar localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user_email');
+        
+        // Mostrar mensaje
+        alert('Sesión cerrada exitosamente');
+        
+        // Redirigir a la página principal
+        window.location.href = '/';
+    }
+})();</script>
 
 {% block extra_js %}{% endblock %}
 </body>

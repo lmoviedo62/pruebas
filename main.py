@@ -77,6 +77,15 @@ async def forgot_password_page(request: Request):
 async def reset_password_page(request: Request):
     return templates.TemplateResponse("reset_password.html", {"request": request})
 
+@app.get("/diario", response_class=HTMLResponse)
+async def diario_page(request: Request):
+    return templates.TemplateResponse("diario.html", {"request": request})
+
+# La ruta /sos ya existe, pero reemplázala con esta versión actualizada
+@app.get("/sos", response_class=HTMLResponse)  
+async def sos_page(request: Request):
+    return templates.TemplateResponse("sos_expanded.html", {"request": request})
+
 # ----------- API REST -------------------
 
 app.include_router(api_router, prefix="/api/v1")

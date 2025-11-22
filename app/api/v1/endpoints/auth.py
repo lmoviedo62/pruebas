@@ -3,11 +3,13 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import secrets
 
-from app.db.session import get_db
+from app.api.deps import get_db, get_current_user
 from app.schemas.user import UserCreate, UserOut, UserLogin
+from app.schemas.auth import Token
 from app.repositories.user_repository import UserRepository
 from app.services.email import email_service
-from app.core.security import get_password_hash, verify_password
+from app.services.auth import verify_password, create_access_token
+from app.core.security import get_password_hash
 from app.models.user import User
 
 router = APIRouter(tags=["auth"])
@@ -15,18 +17,87 @@ router = APIRouter(tags=["auth"])
 
 @router.post("/register", response_model=UserOut)
 def register_user(usuario_in: UserCreate, db: Session = Depends(get_db)):
+    """
+    Registro de nuevo usuario.
+    Valida correo institucional y que no exista previamente.
+    """
     repo = UserRepository(db)
 
-    # comprobar si el correo ya existe
+    # Validar correo institucional
+    if not usuario_in.email.endswith("@ucatolica.edu.co"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El correo debe ser institucional (@ucatolica.edu.co)."
+        )
+
+    # Comprobar si el correo ya existe
     existing = repo.get_by_email(usuario_in.email)
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="El correo ya está registrado.",
         )
+    
+    # Comprobar si la identificación ya existe
+    existing_id = db.query(User).filter(User.identificacion == usuario_in.identificacion).first()
+    if existing_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La identificación ya está registrada en el sistema.",
+        )
 
     user = repo.create(usuario_in)
     return user
+
+
+@router.post("/login", response_model=Token)
+def login(credentials: UserLogin, db: Session = Depends(get_db)):
+    """
+    Login de usuario.
+    Valida credenciales y retorna token JWT.
+    """
+    # Validar correo institucional
+    if not credentials.email.endswith("@ucatolica.edu.co"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El correo debe ser institucional (@ucatolica.edu.co)."
+        )
+    
+    # Buscar usuario
+    user = db.query(User).filter(User.email == credentials.email).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Este correo no está registrado. Por favor regístrate primero."
+        )
+    
+    # Verificar contraseña
+    if not verify_password(credentials.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Contraseña incorrecta."
+        )
+    
+    # Crear token de acceso
+    access_token = create_access_token(data={"sub": user.email})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
+
+@router.post("/logout")
+def logout(current_user: User = Depends(get_current_user)):
+    """
+    Cierra la sesión del usuario actual.
+    En el frontend se debe eliminar el token del localStorage.
+    """
+    return {
+        "message": "Sesión cerrada exitosamente",
+        "user": current_user.email
+    }
 
 
 @router.post("/forgot-password")
@@ -113,46 +184,4 @@ def reset_password(
     
     return {
         "message": "Contraseña actualizada correctamente. Ya puedes iniciar sesión con tu nueva contraseña."
-    }
-
-
-@router.post("/login")
-def login(
-    credentials: UserLogin,
-    db: Session = Depends(get_db)
-):
-    """
-    Endpoint de login (placeholder - debes implementar la lógica completa con JWT)
-    """
-    # Validar correo institucional
-    if not credentials.email.endswith("@ucatolica.edu.co"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El correo debe ser institucional (@ucatolica.edu.co)"
-        )
-    
-    # Buscar usuario
-    user = db.query(User).filter(User.email == credentials.email).first()
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Este correo no está registrado. Por favor regístrate primero."
-        )
-    
-    # Verificar contraseña
-    if not verify_password(credentials.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Contraseña incorrecta."
-        )
-    
-    # Aquí deberías generar el JWT token
-    # Por ahora retornamos un mensaje simple
-    return {
-        "message": "Login exitoso",
-        "user": {
-            "email": user.email,
-            "nombre": user.nombre
-        }
     }

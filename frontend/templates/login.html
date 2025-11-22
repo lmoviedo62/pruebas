@@ -162,6 +162,21 @@
     .register-link a:hover {
       text-decoration: underline;
     }
+
+    .forgot-password {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .forgot-password a {
+      color: #8b5cf6;
+      text-decoration: none;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -210,6 +225,10 @@
         <button type="submit" class="btn-submit" id="btnSubmit">Iniciar sesión</button>
       </form>
 
+      <div class="forgot-password">
+        <a href="/forgot-password">🔒 ¿Olvidaste tu contraseña?</a>
+      </div>
+
       <div class="register-link">
         ¿No tienes cuenta? <a href="/register">Regístrate aquí</a>
       </div>
@@ -252,8 +271,12 @@
           return;
         }
 
-        // Guardar token (opcional para esta versión)
+        // ✅ GUARDAR TOKEN Y EMAIL EN LOCALSTORAGE
         localStorage.setItem("token", data.access_token);
+        localStorage.setItem("user_email", email);
+        
+        // Mostrar mensaje de éxito
+        alert("¡Inicio de sesión exitoso!");
         
         // Redirigir al panel
         window.location.href = "/panel";
