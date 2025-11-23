@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_db
@@ -94,3 +94,87 @@ def free_text(message: str = Body(..., embed=True)):
         return {"reply": get_crisis_response()}
     
     return {"reply": respond_free_text(message)}
+
+# ============ ENDPOINTS DE DIARIO EMOCIONAL ============
+
+@router.get("/diary/entries", response_model=list[EmotionEntryOut])
+def get_diary_entries(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    """
+    Obtiene todas las entradas del diario del usuario actual,
+    ordenadas por fecha (más recientes primero)
+    """
+    entries = db.query(EmotionEntry).filter(
+        EmotionEntry.user_id == current_user.id
+    ).order_by(EmotionEntry.id.desc()).all()
+    
+    return entries
+
+
+@router.post("/diary/entry", response_model=EmotionEntryOut)
+def create_diary_entry(
+    note_in: EmotionEntryCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    """
+    Crea una nueva entrada en el diario emocional
+    """
+    entry = EmotionEntry(
+        user_id=current_user.id,
+        emotion=note_in.emotion,
+        note=note_in.note,
+    )
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return entry
+
+
+@router.put("/diary/entry/{entry_id}", response_model=EmotionEntryOut)
+def update_diary_entry(
+    entry_id: int,
+    note_in: EmotionEntryCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    """
+    Actualiza una entrada del diario
+    """
+    entry = db.query(EmotionEntry).filter(
+        EmotionEntry.id == entry_id,
+        EmotionEntry.user_id == current_user.id
+    ).first()
+    
+    if not entry:
+        raise HTTPException(status_code=404, detail="Entrada no encontrada")
+    
+    entry.emotion = note_in.emotion
+    entry.note = note_in.note
+    db.commit()
+    db.refresh(entry)
+    return entry
+
+
+@router.delete("/diary/entry/{entry_id}")
+def delete_diary_entry(
+    entry_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    """
+    Elimina una entrada del diario
+    """
+    entry = db.query(EmotionEntry).filter(
+        EmotionEntry.id == entry_id,
+        EmotionEntry.user_id == current_user.id
+    ).first()
+    
+    if not entry:
+        raise HTTPException(status_code=404, detail="Entrada no encontrada")
+    
+    db.delete(entry)
+    db.commit()
+    return {"message": "Entrada eliminada correctamente", "id": entry_id}

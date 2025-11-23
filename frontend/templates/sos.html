@@ -1,31 +1,597 @@
-{% extends "base.html" %}
-{% block title %}Ayuda inmediata{% endblock %}
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow border-0 rounded-4">
-            <div class="card-body p-4">
-                <h3 class="text-danger mb-3">Ayuda inmediata</h3>
-                <p>
-                    Si estás viviendo una <strong>emergencia</strong> o sientes que corres peligro,
-                    comunícate de inmediato a las siguientes líneas antes de continuar usando Serena.
-                </p>
-                <ul class="list-group mb-3">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Línea Nacional de Emergencias
-                        <span class="badge bg-danger rounded-pill">123</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Bienestar Universitario
-                        <span class="badge bg-primary rounded-pill">bienestar@ucatolica.edu.co</span>
-                    </li>
-                </ul>
-                <p class="mb-0 text-muted small">
-                    Recuerda: Serena es una herramienta de acompañamiento académico y no reemplaza
-                    la atención psicológica profesional ni los servicios de urgencias.
-                </p>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursos de Ayuda - Serena</title>
+  <style>
+    body {
+      background-color: #f7ebff;
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar-serena {
+      background: linear-gradient(90deg, #8b5cf6, #a855f7);
+      padding: 12px 0;
+    }
+
+    .container-nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      color: white !important;
+      font-weight: 700;
+      font-size: 24px;
+      text-decoration: none;
+    }
+
+    .btn-back {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .container-main {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .alert-emergency {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+    }
+
+    .alert-emergency h2 {
+      margin: 0 0 16px 0;
+      font-size: 28px;
+    }
+
+    .alert-emergency p {
+      font-size: 15px;
+      margin: 0 0 20px 0;
+      line-height: 1.6;
+    }
+
+    .btn-emergency {
+      background: white;
+      color: #dc2626;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .btn-emergency:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .btn-emergency:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    h3 {
+      color: #1f2937;
+      margin-bottom: 24px;
+      font-size: 22px;
+    }
+
+    .card-resource {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+
+    .card-resource:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .resource-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .resource-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .resource-description {
+      color: #6b7280;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .resource-contact {
+      background: #f3f4f6;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      color: #374151;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #dc2626;
+    }
+
+    .urgency-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .urgency-modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      color: #dc2626;
+      margin: 0 0 8px 0;
+      font-size: 24px;
+    }
+
+    .modal-header p {
+      color: #6b7280;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-modal {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-modal-primary {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: white;
+    }
+
+    .btn-modal-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-modal-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-modal-secondary {
+      background: white;
+      color: #6b7280;
+      border: 2px solid #e5e7eb;
+    }
+
+    .btn-modal-secondary:hover {
+      background: #f9fafb;
+    }
+
+    @media (max-width: 768px) {
+      .modal-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar-serena">
+    <div class="container-nav">
+      <a href="/" class="navbar-brand">💜 Serena</a>
+      <a href="/panel" class="btn-back">← Volver al panel</a>
     </div>
-</div>
-{% endblock %}
+  </nav>
+
+  <div class="container-main">
+    <!-- Alertas -->
+    <div id="alertSuccess" class="alert alert-success"></div>
+    <div id="alertError" class="alert alert-error"></div>
+
+    <!-- Alerta de emergencia -->
+    <div class="alert-emergency">
+      <h2>🆘 ¿Necesitas ayuda inmediata?</h2>
+      <p>
+        Si estás en una situación de emergencia, crisis emocional o necesitas hablar con alguien urgentemente, 
+        puedes solicitar atención profesional ahora mismo.
+      </p>
+      <button id="btnUrgency" class="btn-emergency">
+        📞 Solicitar atención urgente de Bienestar
+      </button>
+    </div>
+
+    <h3>📞 Líneas de ayuda disponibles 24/7</h3>
+
+    <!-- Recursos -->
+    <div class="card-resource">
+      <div class="resource-icon">🚨</div>
+      <div class="resource-title">Línea Nacional de Emergencias</div>
+      <div class="resource-description">
+        Para emergencias médicas, policiales o cualquier situación que requiera atención inmediata.
+      </div>
+      <div class="resource-contact">📞 123</div>
+    </div>
+
+    <div class="card-resource">
+      <div class="resource-icon">💜</div>
+      <div class="resource-title">Bienestar Universitario UCC</div>
+      <div class="resource-description">
+        Atención psicológica, orientación y apoyo emocional para estudiantes de la Universidad Católica.
+      </div>
+      <div class="resource-contact">📧 bienestar@ucatolica.edu.co</div>
+    </div>
+
+    <div class="card-resource">
+      <div class="resource-icon">💙</div>
+      <div class="resource-title">Línea 106 - Línea de la vida</div>
+      <div class="resource-description">
+        Línea gratuita de orientación psicológica y prevención del suicidio disponible 24/7 en toda Colombia.
+      </div>
+      <div class="resource-contact">📞 106</div>
+    </div>
+
+    <div class="card-resource">
+      <div class="resource-icon">🏥</div>
+      <div class="resource-title">Línea 155 - Orientación en Salud Mental</div>
+      <div class="resource-description">
+        Orientación en salud mental, atención psicosocial y referencia a servicios de salud del Ministerio de Salud.
+      </div>
+      <div class="resource-contact">📞 155</div>
+    </div>
+
+    <div class="card-resource">
+      <div class="resource-icon">👥</div>
+      <div class="resource-title">Línea 141 - ICBF</div>
+      <div class="resource-description">
+        Protección de niños, niñas y adolescentes. Denuncia de maltrato, abuso o violencia.
+      </div>
+      <div class="resource-contact">📞 141</div>
+    </div>
+
+    <div class="card-resource">
+      <div class="resource-icon">👮</div>
+      <div class="resource-title">Línea 155 - Violencia Intrafamiliar</div>
+      <div class="resource-description">
+        Atención y orientación para casos de violencia intrafamiliar y de género. Fiscalía General de la Nación.
+      </div>
+      <div class="resource-contact">📞 155 (Opción 7)</div>
+    </div>
+
+    <div class="card-resource">
+      <div class="resource-icon">🩺</div>
+      <div class="resource-title">Cruz Roja Colombiana</div>
+      <div class="resource-description">
+        Atención de primeros auxilios psicológicos y apoyo en crisis emocionales.
+      </div>
+      <div class="resource-contact">📞 132</div>
+    </div>
+
+    <div class="card-resource">
+      <div class="resource-icon">🌐</div>
+      <div class="resource-title">Chat de Apoyo Emocional - Línea Amiga</div>
+      <div class="resource-description">
+        Servicio de chat anónimo y confidencial para hablar sobre problemas emocionales.
+      </div>
+      <div class="resource-contact">🌐 lineaamigabogota.gov.co</div>
+    </div>
+  </div>
+
+  <!-- Modal de urgencia -->
+  <div id="urgencyModal" class="urgency-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🆘 Solicitud de Atención Urgente</h2>
+        <p>Completa este formulario y nos pondremos en contacto contigo lo antes posible</p>
+      </div>
+
+      <form id="urgencyForm">
+        <div class="form-group">
+          <label class="form-label">Tipo de urgencia</label>
+          <select class="form-control" id="urgencyType" required>
+            <option value="">Selecciona...</option>
+            <option value="crisis_emocional">🆘 Crisis emocional - Necesito hablar ahora</option>
+            <option value="pensamientos_suicidas">⚠️ Pensamientos de autolesión o suicidio</option>
+            <option value="ansiedad_panico">😰 Ataque de ansiedad o pánico</option>
+            <option value="violencia">🚨 Situación de violencia o abuso</option>
+            <option value="emergencia_personal">💔 Emergencia personal grave</option>
+            <option value="otro">💬 Otra situación urgente</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Describe brevemente tu situación</label>
+          <textarea 
+            class="form-control" 
+            id="urgencyMessage" 
+            required
+            placeholder="Cuéntanos qué está pasando para que podamos ayudarte mejor..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">¿Estás en un lugar seguro ahora?</label>
+          <select class="form-control" id="safeSituation" required>
+            <option value="">Selecciona...</option>
+            <option value="si">✅ Sí, estoy en un lugar seguro</option>
+            <option value="no">❌ No, necesito ayuda inmediata</option>
+            <option value="no_seguro">⚠️ No estoy seguro/a</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-modal btn-modal-secondary" id="btnCancelModal">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-modal btn-modal-primary" id="btnSendUrgency">
+            📨 Enviar solicitud urgente
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const userEmail = localStorage.getItem('user_email');
+
+    const btnUrgency = document.getElementById('btnUrgency');
+    const urgencyModal = document.getElementById('urgencyModal');
+    const btnCancelModal = document.getElementById('btnCancelModal');
+    const urgencyForm = document.getElementById('urgencyForm');
+    const btnSendUrgency = document.getElementById('btnSendUrgency');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+
+    // Verificar autenticación
+    if (!token || !userEmail) {
+      window.location.href = '/login';
+    }
+
+    // Abrir modal
+    btnUrgency.addEventListener('click', () => {
+      urgencyModal.classList.add('show');
+    });
+
+    // Cerrar modal
+    btnCancelModal.addEventListener('click', () => {
+      urgencyModal.classList.remove('show');
+      urgencyForm.reset();
+    });
+
+    // Cerrar modal al hacer clic fuera
+    urgencyModal.addEventListener('click', (e) => {
+      if (e.target === urgencyModal) {
+        urgencyModal.classList.remove('show');
+        urgencyForm.reset();
+      }
+    });
+
+    // Mostrar alerta
+    function showAlert(message, type = 'success') {
+      const alert = type === 'success' ? alertSuccess : alertError;
+      alert.textContent = message;
+      alert.classList.add('show');
+      
+      setTimeout(() => {
+        alert.classList.remove('show');
+      }, 5000);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Enviar formulario
+    urgencyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const urgencyType = document.getElementById('urgencyType').value;
+      const urgencyMessage = document.getElementById('urgencyMessage').value;
+      const safeSituation = document.getElementById('safeSituation').value;
+
+      // Validación especial para situaciones críticas
+      if (urgencyType === 'pensamientos_suicidas' || safeSituation === 'no') {
+        alert('⚠️ ATENCIÓN: Detectamos que estás en una situación crítica.\n\n' +
+              'Por favor, contacta INMEDIATAMENTE:\n' +
+              '• Línea 123 (Emergencias)\n' +
+              '• Línea 106 (Línea de la vida - 24/7)\n\n' +
+              'También enviaremos tu solicitud a Bienestar Universitario.');
+      }
+
+      btnSendUrgency.disabled = true;
+      btnSendUrgency.textContent = '⏳ Enviando...';
+
+      try {
+        // Enviar al endpoint real
+        const response = await fetch('/api/v1/sos/send-urgency', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            urgency_type: document.querySelector('#urgencyType option:checked').textContent,
+            message: urgencyMessage,
+            safe_situation: document.querySelector('#safeSituation option:checked').textContent,
+            timestamp: new Date().toLocaleString('es-CO', { 
+              timeZone: 'America/Bogota',
+              dateStyle: 'full',
+              timeStyle: 'long'
+            })
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al enviar solicitud');
+        }
+
+        // Éxito
+        urgencyModal.classList.remove('show');
+        urgencyForm.reset();
+
+        showAlert(
+          '✅ Tu solicitud ha sido enviada a Bienestar Universitario. ' +
+          'Nos pondremos en contacto contigo lo antes posible. ' +
+          'Si tu situación es crítica, por favor llama al 123 o al 106.',
+          'success'
+        );
+
+        // Si es caso crítico, mostrar mensaje adicional
+        if (urgencyType === 'pensamientos_suicidas' || safeSituation === 'no') {
+          setTimeout(() => {
+            alert('🆘 RECUERDA: Si estás en peligro inmediato:\n\n' +
+                  '📞 Línea 123 - Emergencias\n' +
+                  '📞 Línea 106 - Línea de la vida (24/7)\n\n' +
+                  'No estás solo/a. Hay personas que quieren ayudarte.');
+          }, 500);
+        }
+
+      } catch (error) {
+        console.error('❌ Error:', error);
+        showAlert(
+          '❌ Hubo un error al enviar tu solicitud. ' +
+          'Por favor, contacta directamente a bienestar@ucatolica.edu.co o llama al 123.',
+          'error'
+        );
+      } finally {
+        btnSendUrgency.disabled = false;
+        btnSendUrgency.textContent = '📨 Enviar solicitud urgente';
+      }
+    });
+  </script>
+</body>
+</html>

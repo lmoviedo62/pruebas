@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Diario Emocional - Serena</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8edf4 100%);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, #8b5cf6, #a855f7);
+      padding: 16px 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      color: white;
+      font-size: 22px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .navbar-links a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .navbar-links a:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    .header-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-left: 5px solid #8b5cf6;
+    }
+
+    .header-card h1 {
+      color: #1f2937;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .header-card p {
+      color: #6b7280;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .entry-form-card {
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-title {
+      font-size: 20px;
+      color: #1f2937;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .emotion-selector {
+      margin-bottom: 24px;
+    }
+
+    .emotion-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .emotion-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .emotion-btn {
+      padding: 10px 18px;
+      border-radius: 20px;
+      border: 2px solid;
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .emotion-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .emotion-btn.active {
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .emotion-btn.muy-mal { color: #dc2626; border-color: #dc2626; }
+    .emotion-btn.muy-mal.active { background: #fee2e2; }
+    
+    .emotion-btn.triste { color: #f59e0b; border-color: #f59e0b; }
+    .emotion-btn.triste.active { background: #fef3c7; }
+    
+    .emotion-btn.neutral { color: #6b7280; border-color: #6b7280; }
+    .emotion-btn.neutral.active { background: #f3f4f6; }
+    
+    .emotion-btn.bien { color: #10b981; border-color: #10b981; }
+    .emotion-btn.bien.active { background: #d1fae5; }
+    
+    .emotion-btn.muy-bien { color: #3b82f6; border-color: #3b82f6; }
+    .emotion-btn.muy-bien.active { background: #dbeafe; }
+
+    .diary-textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      line-height: 1.6;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+
+    .diary-textarea:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #8b5cf6, #a855f7);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #6b7280;
+      border: 2px solid #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    .history-section {
+      margin-top: 32px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .history-title {
+      font-size: 24px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .entry-count {
+      font-size: 14px;
+      color: #6b7280;
+      background: #f3f4f6;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    .entries-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .entry-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border-left: 4px solid;
+      transition: all 0.2s;
+    }
+
+    .entry-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .entry-card.muy-mal { border-left-color: #dc2626; }
+    .entry-card.triste { border-left-color: #f59e0b; }
+    .entry-card.neutral { border-left-color: #6b7280; }
+    .entry-card.bien { border-left-color: #10b981; }
+    .entry-card.muy-bien { border-left-color: #3b82f6; }
+
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .entry-emotion {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .entry-emotion.muy-mal { background: #fee2e2; color: #dc2626; }
+    .entry-emotion.triste { background: #fef3c7; color: #f59e0b; }
+    .entry-emotion.neutral { background: #f3f4f6; color: #6b7280; }
+    .entry-emotion.bien { background: #d1fae5; color: #10b981; }
+    .entry-emotion.muy-bien { background: #dbeafe; color: #3b82f6; }
+
+    .entry-date {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .entry-content {
+      color: #374151;
+      line-height: 1.6;
+      font-size: 14px;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+    }
+
+    .entry-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn-icon {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-edit {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .btn-edit:hover {
+      background: #bfdbfe;
+    }
+
+    .btn-delete {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .btn-delete:hover {
+      background: #fecaca;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9ca3af;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state-text {
+      font-size: 18px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .empty-state-subtext {
+      font-size: 14px;
+      color: #9ca3af;
+    }
+
+    .alert {
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #dc2626;
+    }
+
+    @media (max-width: 768px) {
+      .emotion-buttons {
+        flex-direction: column;
+      }
+      
+      .emotion-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-content">
+      <a href="/" class="navbar-brand">💜 Serena</a>
+      <div class="navbar-links">
+        <a href="/panel">Panel</a>
+        <a href="/chat">Chat</a>
+        <a href="/diario">Diario</a>
+        <a href="/sos">Ayuda</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header-card">
+      <h1>📖 Mi Diario Emocional</h1>
+      <p>
+        Este es tu espacio seguro y privado para expresar tus emociones, pensamientos y experiencias. 
+        Escribir regularmente te ayuda a procesar tus sentimientos y seguir tu progreso emocional.
+      </p>
+    </div>
+
+    <div id="alertSuccess" class="alert alert-success"></div>
+    <div id="alertError" class="alert alert-error"></div>
+
+    <div class="entry-form-card">
+      <h2 class="form-title" id="formTitle">✍️ Nueva entrada de hoy</h2>
+
+      <div class="emotion-selector">
+        <label class="emotion-label">¿Cómo te sientes hoy?</label>
+        <div class="emotion-buttons">
+          <button class="emotion-btn muy-mal" data-emotion="muy_mal">😢 Muy mal</button>
+          <button class="emotion-btn triste" data-emotion="triste">😔 Triste</button>
+          <button class="emotion-btn neutral" data-emotion="neutral">😐 Neutral</button>
+          <button class="emotion-btn bien" data-emotion="bien">🙂 Bien</button>
+          <button class="emotion-btn muy-bien" data-emotion="muy_bien">😊 Muy bien</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="emotion-label">Escribe lo que quieras expresar:</label>
+        <textarea 
+          id="diaryTextarea" 
+          class="diary-textarea" 
+          placeholder="¿Qué pasó hoy? ¿Cómo te sientes? ¿Qué pensamientos te acompañan?&#10;&#10;Este es tu espacio, sin juicios. Puedes escribir lo que necesites..."
+        ></textarea>
+        <div class="char-count">
+          <span id="charCount">0</span> caracteres
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button id="btnSave" class="btn btn-primary">💾 Guardar entrada</button>
+        <button id="btnCancel" class="btn btn-secondary" style="display: none;">✖️ Cancelar</button>
+      </div>
+    </div>
+
+    <div class="history-section">
+      <div class="history-header">
+        <h2 class="history-title">📚 Historial de entradas</h2>
+        <span class="entry-count" id="entryCount">0 entradas</span>
+      </div>
+
+      <div id="entriesList" class="entries-list"></div>
+
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <div class="empty-state-icon">📝</div>
+        <div class="empty-state-text">Aún no tienes entradas en tu diario</div>
+        <div class="empty-state-subtext">
+          Comienza a escribir cómo te sientes hoy. Tu futuro yo te lo agradecerá.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedEmotion = null;
+    let editingEntryId = null;
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      window.location.href = '/login';
+    }
+
+    const emotionButtons = document.querySelectorAll('.emotion-btn');
+    const diaryTextarea = document.getElementById('diaryTextarea');
+    const charCount = document.getElementById('charCount');
+    const btnSave = document.getElementById('btnSave');
+    const btnCancel = document.getElementById('btnCancel');
+    const entriesList = document.getElementById('entriesList');
+    const emptyState = document.getElementById('emptyState');
+    const entryCount = document.getElementById('entryCount');
+    const formTitle = document.getElementById('formTitle');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const alertError = document.getElementById('alertError');
+
+    const emotionEmojis = {
+      'muy_mal': '😢',
+      'triste': '😔',
+      'neutral': '😐',
+      'bien': '🙂',
+      'muy_bien': '😊'
+    };
+
+    const emotionLabels = {
+      'muy_mal': 'Muy mal',
+      'triste': 'Triste',
+      'neutral': 'Neutral',
+      'bien': 'Bien',
+      'muy_bien': 'Muy bien'
+    };
+
+    emotionButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        emotionButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedEmotion = btn.dataset.emotion;
+      });
+    });
+
+    diaryTextarea.addEventListener('input', () => {
+      charCount.textContent = diaryTextarea.value.length;
+    });
+
+    function showAlert(message, type = 'success') {
+      const alert = type === 'success' ? alertSuccess : alertError;
+      alert.textContent = message;
+      alert.classList.add('show');
+      
+      setTimeout(() => {
+        alert.classList.remove('show');
+      }, 4000);
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        return `Hoy a las ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+      } else if (diffDays === 1) {
+        return `Ayer a las ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+      } else if (diffDays < 7) {
+        return `Hace ${diffDays} días`;
+      } else {
+        return date.toLocaleDateString('es-ES', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+      }
+    }
+
+    async function loadEntries() {
+      try {
+        const response = await fetch('/api/v1/chatbot/diary/entries', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Error al cargar entradas');
+
+        const entries = await response.json();
+        
+        entryCount.textContent = `${entries.length} ${entries.length === 1 ? 'entrada' : 'entradas'}`;
+
+        if (entries.length === 0) {
+          entriesList.style.display = 'none';
+          emptyState.style.display = 'block';
+          return;
+        }
+
+        entriesList.style.display = 'flex';
+        emptyState.style.display = 'none';
+
+        entriesList.innerHTML = entries.map(entry => `
+          <div class="entry-card ${entry.emotion}">
+            <div class="entry-header">
+              <span class="entry-emotion ${entry.emotion}">
+                ${emotionEmojis[entry.emotion]} ${emotionLabels[entry.emotion]}
+              </span>
+              <span class="entry-date">${formatDate(entry.created_at)}</span>
+            </div>
+            <div class="entry-content">${entry.note || 'Sin contenido'}</div>
+            <div class="entry-actions">
+              <button class="btn-icon btn-edit" onclick="editEntry(${entry.id}, '${entry.emotion}', \`${(entry.note || '').replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                ✏️ Editar
+              </button>
+              <button class="btn-icon btn-delete" onclick="deleteEntry(${entry.id})">
+                🗑️ Eliminar
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error al cargar el historial', 'error');
+      }
+    }
+
+    btnSave.addEventListener('click', async () => {
+      if (!selectedEmotion) {
+        showAlert('Por favor selecciona cómo te sientes', 'error');
+        return;
+      }
+
+      if (!diaryTextarea.value.trim()) {
+        showAlert('Por favor escribe algo en tu diario', 'error');
+        return;
+      }
+
+      const data = {
+        emotion: selectedEmotion,
+        note: diaryTextarea.value.trim()
+      };
+
+      try {
+        btnSave.disabled = true;
+        btnSave.textContent = '⏳ Guardando...';
+
+        const url = editingEntryId 
+          ? `/api/v1/chatbot/diary/entry/${editingEntryId}`
+          : '/api/v1/chatbot/diary/entry';
+
+        const method = editingEntryId ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error('Error al guardar');
+
+        showAlert(
+          editingEntryId 
+            ? '✅ Entrada actualizada correctamente' 
+            : '✅ Entrada guardada en tu diario', 
+          'success'
+        );
+
+        resetForm();
+        await loadEntries();
+
+      } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error al guardar la entrada', 'error');
+      } finally {
+        btnSave.disabled = false;
+        btnSave.textContent = '💾 Guardar entrada';
+      }
+    });
+
+    window.editEntry = function(id, emotion, note) {
+      editingEntryId = id;
+      selectedEmotion = emotion;
+      diaryTextarea.value = note;
+      charCount.textContent = note.length;
+
+      emotionButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.emotion === emotion);
+      });
+
+      formTitle.textContent = '✏️ Editando entrada';
+      btnSave.textContent = '💾 Actualizar entrada';
+      btnCancel.style.display = 'inline-block';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.deleteEntry = async function(id) {
+      if (!confirm('¿Estás seguro de que quieres eliminar esta entrada? Esta acción no se puede deshacer.')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/v1/chatbot/diary/entry/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Error al eliminar');
+
+        showAlert('🗑️ Entrada eliminada correctamente', 'success');
+        await loadEntries();
+
+      } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error al eliminar la entrada', 'error');
+      }
+    };
+
+    btnCancel.addEventListener('click', () => {
+      resetForm();
+    });
+
+    function resetForm() {
+      editingEntryId = null;
+      selectedEmotion = null;
+      diaryTextarea.value = '';
+      charCount.textContent = '0';
+      
+      emotionButtons.forEach(btn => btn.classList.remove('active'));
+      
+      formTitle.textContent = '✍️ Nueva entrada de hoy';
+      btnSave.textContent = '💾 Guardar entrada';
+      btnCancel.style.display = 'none';
+    }
+
+    loadEntries();
+  </script>
+</body>
+</html>
