@@ -2,191 +2,529 @@ from typing import Literal
 
 EmotionType = Literal["muy_mal", "triste", "neutral", "bien", "muy_bien"]
 
-def get_emotion_options(emotion: EmotionType) -> dict:
-    """
-    Respuestas empáticas basadas en principios de psicología cognitivo-conductual.
-    Valida las emociones del usuario y ofrece apoyo personalizado.
-    """
+# ========== DETECCIÓN DE CRISIS ==========
+def detect_crisis(text: str) -> bool:
+    """Detecta palabras clave de crisis suicida o autolesión"""
+    crisis_keywords = [
+        "suicidio", "suicidarme", "matarme", "morir", "muerte", "acabar", 
+        "terminar todo", "no quiero vivir", "mejor muerto", "muerta",
+        "hacerme daño", "lastimarme", "cortarme", "quitarme la vida",
+        "ya no aguanto", "no vale la pena", "desaparecer"
+    ]
+    
+    text_lower = text.lower()
+    return any(keyword in text_lower for keyword in crisis_keywords)
+
+
+def get_crisis_response() -> str:
+    """Respuesta de emergencia para situaciones de crisis"""
+    return """🆘 NECESITAS AYUDA PROFESIONAL INMEDIATA
+
+Siento mucho que estés pasando por tanto dolor. Lo que sientes es real, pero hay personas que pueden ayudarte AHORA.
+
+📞 CONTACTA INMEDIATAMENTE:
+
+🔴 Línea 106 - Línea de la vida (24/7, gratuita)
+🔴 Línea 123 - Emergencias
+🔴 Bienestar Universitario: bienestar@ucatolica.edu.co
+
+NO ESTÁS SOLO/A. TU VIDA ES VALIOSA.
+
+Si estás en peligro inmediato, ve al servicio de urgencias más cercano o llama al 123."""
+
+
+def get_emotion_response(emotion: EmotionType) -> dict:
+    """Respuestas con contenido práctico para cada emoción"""
     
     responses = {
         "muy_mal": {
-            "mensaje": (
-                "Lamento mucho que te sientas así en este momento. Lo que estás experimentando "
-                "es válido y tiene sentido. Cuando nos sentimos muy mal, nuestro cuerpo y mente "
-                "nos están enviando una señal importante de que algo necesita atención.\n\n"
-                "Quiero que sepas que no estás solo/a en esto. Muchas personas atraviesan momentos "
-                "difíciles, y buscar apoyo es un acto de valentía y autocuidado. Tu bienestar "
-                "es importante y mereces sentirte mejor.\n\n"
-                "Antes de continuar, quiero preguntarte: ¿Te sientes en peligro inmediato o has "
-                "pensado en hacerte daño? Si es así, es fundamental que contactes de inmediato con "
-                "Bienestar Universitario (bienestar@ucatolica.edu.co) o la Línea 106 (disponible 24/7)."
-            ),
+            "mensaje": """💜 Lamento que te sientas así. Lo que experimentas es válido.
+
+⚠️ SI HAS PENSADO EN HACERTE DAÑO, contacta YA:
+• Línea 106 (24/7)
+• bienestar@ucatolica.edu.co
+• 123 Emergencias
+
+¿Cómo te gustaría que te apoye?""",
+            
             "opciones": [
                 {
-                    "type": "respiracion",
-                    "label": "Quiero un ejercicio de respiración para calmarme ahora",
-                    "descripcion": "Te guiaré en una técnica de respiración que ayuda a regular el sistema nervioso"
+                    "id": "respiracion_crisis",
+                    "label": "🫁 Ejercicio de respiración urgente",
+                    "contenido": """🫁 RESPIRACIÓN 4-7-8 (Calma inmediata)
+
+1. INHALA por la nariz: 1-2-3-4
+2. SOSTÉN: 1-2-3-4-5-6-7
+3. EXHALA por la boca: 1-2-3-4-5-6-7-8
+
+Repite 4 veces.
+
+Después del 2do ciclo sentirás más calma.
+Después del 4to tu corazón habrá bajado.
+
+Hazlo AHORA. 💜"""
                 },
+                
                 {
-                    "type": "validacion",
-                    "label": "Necesito hablar sobre lo que siento",
-                    "descripcion": "Creemos un espacio seguro para explorar tus emociones"
+                    "id": "consejo_crisis",
+                    "label": "💭 Mensaje de esperanza",
+                    "contenido": """💭 PARA TI EN ESTE MOMENTO
+
+• Este momento es TEMPORAL
+• Has sobrevivido al 100% de tus peores días
+• Los pensamientos NO son hechos
+• Pedir ayuda es VALENTÍA, no debilidad
+
+Habrá días mejores. Tu futuro yo te agradece que sigas aquí.
+
+Contacta Bienestar: bienestar@ucatolica.edu.co
+O Línea 106 (24/7)
+
+¿Qué UNA cosa puedes hacer HOY para cuidarte? 💜"""
                 },
+                
                 {
-                    "type": "recursos_urgente",
-                    "label": "Necesito ayuda profesional urgente",
-                    "descripcion": "Te conectaré con recursos de apoyo inmediato"
+                    "id": "grounding_crisis",
+                    "label": "⚓ Técnica de grounding 5-4-3-2-1",
+                    "contenido": """⚓ TÉCNICA 5-4-3-2-1 (Volver al presente)
+
+Nombra en voz alta:
+
+5 cosas que VES
+4 cosas que TOCAS
+3 cosas que OYES
+2 cosas que HUELES
+1 cosa que SABOREAS
+
+Esto te ancla al momento presente y detiene pensamientos negativos.
+
+¿Cómo te sientes ahora? ⚓"""
                 },
+                
                 {
-                    "type": "pensamiento_util",
-                    "label": "Ayúdame a ordenar mis pensamientos",
-                    "descripcion": "Trabajemos juntos para identificar y modificar pensamientos que generan malestar"
+                    "id": "recursos_crisis",
+                    "label": "🆘 Contactos de ayuda inmediata",
+                    "contenido": """🆘 RECURSOS AHORA
+
+📞 Línea 106 - 24/7, gratuita, confidencial
+📞 Línea 123 - Emergencias
+📧 bienestar@ucatolica.edu.co - Atención psicológica
+📞 Línea 155 - Salud Mental
+
+¿Qué decir? "Estoy pasando por un momento muy difícil y necesito hablar."
+
+NO tienes que enfrentarlo solo/a. 💜"""
                 }
             ]
         },
         
         "triste": {
-            "mensaje": (
-                "Entiendo que estás pasando por un momento de tristeza. La tristeza es una emoción "
-                "humana completamente natural y válida; nos conecta con lo que valoramos y nos "
-                "muestra qué es importante para nosotros.\n\n"
-                "A veces, cuando estamos tristes, nuestros pensamientos pueden volverse más negativos "
-                "de lo que la realidad merece. Es como si lleváramos puestos unos 'lentes oscuros' "
-                "que filtran nuestra percepción. Parte de mi trabajo es ayudarte a reconocer estos "
-                "patrones y encontrar una perspectiva más equilibrada.\n\n"
-                "Recuerda: sentir tristeza no significa debilidad. Significa que eres humano/a y que "
-                "tu experiencia emocional es rica y compleja. Estoy aquí para acompañarte."
-            ),
+            "mensaje": """💙 Entiendo tu tristeza. Es una emoción válida que nos conecta con lo que valoramos.
+
+A veces los pensamientos se vuelven más negativos de lo necesario. Trabajemos juntos.
+
+¿Qué necesitas?""",
+            
             "opciones": [
                 {
-                    "type": "exploracion",
-                    "label": "Quiero explorar de dónde viene esta tristeza",
-                    "descripcion": "Identifiquemos juntos qué situaciones o pensamientos están influyendo en tu estado"
+                    "id": "meditacion_tristeza",
+                    "label": "🧘 Meditación de aceptación (10 min)",
+                    "contenido": """🧘 MEDITACIÓN DE ACEPTACIÓN
+
+1. Siéntate cómodo, cierra los ojos
+2. Respira naturalmente 2 minutos
+3. Nota DÓNDE sientes la tristeza (pecho, garganta, estómago)
+4. Respira HACIA esa sensación. No la cambies, solo acompáñala
+5. Repite: "Está bien sentir esto. Soy humano/a. Esto pasará"
+6. Coloca una mano en tu corazón. Siente su calor
+7. Abre los ojos gradualmente
+
+La tristeza es como una ola. Si luchas, te arrastra. Si observas, pasa sobre ti. 💙"""
                 },
+                
                 {
-                    "type": "activacion",
-                    "label": "Dame ideas para activarme y sentirme mejor",
-                    "descripcion": "La activación conductual puede ayudarte a romper el ciclo de la tristeza"
+                    "id": "consejo_tristeza",
+                    "label": "💬 Mensaje de apoyo emocional",
+                    "contenido": """💬 PARA TU TRISTEZA
+
+Está bien no estar bien. Permitirte sentir es honestidad, no debilidad.
+
+Esto NO durará para siempre. Las emociones son temporales.
+
+Eres más fuerte de lo que crees. Estás AQUÍ, buscando ayuda.
+
+PERMISO PARA:
+✅ Llorar cuando lo necesites
+✅ Pedir apoyo sin culpa
+✅ Tomarte tu tiempo
+✅ Priorizarte
+
+¿Qué UNA cosa necesita tu cuerpo/mente ahora? (descanso, comida, movimiento, conexión)
+
+Bienestar: bienestar@ucatolica.edu.co 💙"""
                 },
+                
                 {
-                    "type": "meditacion",
-                    "label": "Quiero una meditación para aceptar esta emoción",
-                    "descripcion": "Practicaremos mindfulness para observar tu tristeza sin juzgarla"
+                    "id": "activacion_tristeza",
+                    "label": "⚡ Ideas para activarme",
+                    "contenido": """⚡ ROMPE EL CICLO
+
+La inactividad EMPEORA la tristeza. Acciones pequeñas:
+
+NIVEL BÁSICO:
+□ Lávate la cara con agua fría
+□ Toma agua
+□ Abre una ventana 5 min
+□ Ponte ropa limpia
+
+NIVEL MEDIO:
+□ Camina 10 minutos
+□ Llama a alguien
+□ Escucha UNA canción
+□ Ordena UN objeto
+
+REGLA DE ORO: "No necesito ganas para hacerlo. Hacerlo me dará ganas."
+
+Elige UNA ahora. ⚡"""
                 },
+                
                 {
-                    "type": "reestructuracion",
-                    "label": "Ayúdame a ver las cosas desde otra perspectiva",
-                    "descripcion": "Trabajaremos en identificar y cuestionar pensamientos negativos automáticos"
+                    "id": "recurso_tristeza",
+                    "label": "📚 Entender la tristeza",
+                    "contenido": """📚 QUÉ ES LA TRISTEZA
+
+FUNCIONES:
+• Te dice qué es importante
+• Te pide hacer una pausa
+• Te conecta con otros
+
+TRISTEZA vs DEPRESIÓN:
+
+Tristeza normal:
+• Evento específico
+• Días/semanas
+• No interfiere mucho
+• Puedes disfrutar algunas cosas
+
+Depresión (busca ayuda):
+• Sin causa clara
+• Más de 2 semanas
+• Afecta trabajo/estudio
+• No disfrutas NADA
+• Cambios en sueño/apetito
+
+⚠️ Si tienes 5+ síntomas de depresión, contacta Bienestar. 📚"""
                 }
             ]
         },
         
         "neutral": {
-            "mensaje": (
-                "Gracias por compartir cómo te sientes. Estar en un estado neutral también es "
-                "válido y puede ser un buen momento para reflexionar y fortalecerte emocionalmente.\n\n"
-                "A veces, la neutralidad puede significar calma y estabilidad, otras veces puede "
-                "ser señal de desconexión emocional o de estar 'en pausa'. Ambas son experiencias "
-                "comunes y está bien sentirse así.\n\n"
-                "Este puede ser un momento ideal para desarrollar herramientas de autocuidado, "
-                "explorar tus patrones de pensamiento, o simplemente practicar habilidades que te "
-                "preparen para cuando vengan momentos más desafiantes. La prevención y el desarrollo "
-                "personal son tan importantes como trabajar en crisis."
-            ),
+            "mensaje": """😌 Gracias por compartir que te sientes neutral.
+
+Es un buen momento para fortalecer recursos emocionales y prepararte para el futuro.
+
+¿En qué trabajamos hoy?""",
+            
             "opciones": [
                 {
-                    "type": "autoconocimiento",
-                    "label": "Quiero conocerme mejor emocionalmente",
-                    "descripcion": "Exploremos tus patrones emocionales y cómo respondes a diferentes situaciones"
+                    "id": "respiracion_neutral",
+                    "label": "🌬️ Respiración coherente",
+                    "contenido": """🌬️ RESPIRACIÓN COHERENTE (Equilibrio)
+
+INHALA 5 segundos
+EXHALA 5 segundos
+
+Practica 2 minutos mínimo (12 ciclos).
+
+CUÁNDO USAR:
+☀️ Mañana → Energiza
+🌙 Noche → Mejor sueño
+📚 Antes de estudiar → Concentración
+🎭 Antes de evento → Reduce ansiedad
+
+Beneficios: Semana 1 más calma, Semana 2 mejor estrés, Semana 3 mejor sueño. 🌬️"""
                 },
+                
                 {
-                    "type": "herramientas",
-                    "label": "Enséñame herramientas para el futuro",
-                    "descripcion": "Desarrollemos estrategias de afrontamiento para cuando las necesites"
+                    "id": "mindfulness_neutral",
+                    "label": "🧘 Mindfulness 5 minutos",
+                    "contenido": """🧘 MINDFULNESS BÁSICO
+
+1. Siéntate cómodo, espalda recta
+2. Cierra los ojos
+3. Respira natural 2 min (solo observa)
+4. Nota sensaciones en tu cuerpo 1 min
+5. Escucha sonidos 1 min
+6. Respira profundo 3 veces, abre ojos
+
+BENEFICIOS:
+✓ Reduce estrés
+✓ Mejora concentración
+✓ Aumenta autoconciencia
+
+Practica 5 min al día durante 1 semana. 🧘"""
                 },
+                
                 {
-                    "type": "mindfulness",
-                    "label": "Quiero practicar presencia plena",
-                    "descripcion": "La atención plena te ayuda a conectar con el momento presente"
+                    "id": "autoconocimiento_neutral",
+                    "label": "🔍 Ejercicio de autoconocimiento",
+                    "contenido": """🔍 CONÓCETE MEJOR
+
+MIS EMOCIONES FRECUENTES:
+¿Cuáles siento más? (ansiedad, tristeza, alegría, calma)
+_______________________
+
+MIS DESENCADENANTES:
+¿Qué situaciones activan emociones difíciles?
+_______________________
+
+MIS RECURSOS:
+¿Qué fortalezas tengo?
+_______________________
+
+MI RED DE APOYO:
+¿A quién puedo acudir?
+_______________________
+
+NECESIDADES BÁSICAS (1-10):
+Sueño: __ Alimentación: __ Ejercicio: __
+Social: __ Tiempo para mí: __
+
+Conocerte es un proceso continuo. 🔍"""
                 },
+                
                 {
-                    "type": "metas",
-                    "label": "Ayúdame a establecer metas de bienestar",
-                    "descripcion": "Identifiquemos objetivos concretos para tu desarrollo emocional"
+                    "id": "herramientas_neutral",
+                    "label": "🛠️ Construir mi caja de herramientas",
+                    "contenido": """🛠️ TU CAJA DE HERRAMIENTAS
+
+PARA ANSIEDAD:
+✓ Respiración 4-7-8
+✓ Grounding 5-4-3-2-1
+✓ Caminar 10 min
+
+PARA TRISTEZA:
+✓ Activación (hacer algo pequeño)
+✓ Llamar a alguien
+✓ Escribir en diario
+
+PARA ENERGÍA:
+✓ Dormir bien (7-9h)
+✓ Comer nutritivo
+✓ Luz solar 20 min
+
+Esta semana, prueba UNA herramienta nueva cada día.
+
+No esperes a estar en crisis. Practica ahora. 🛠️"""
                 }
             ]
         },
-        
+
         "bien": {
-            "mensaje": (
-                "¡Me alegra mucho saber que te sientes bien! Es importante reconocer y celebrar "
-                "estos momentos positivos. A veces, cuando las cosas van bien, tendemos a no "
-                "prestarles atención, pero son igual de valiosos que los momentos difíciles.\n\n"
-                "Sentirse bien no es casualidad: generalmente es el resultado de pensamientos más "
-                "equilibrados, acciones constructivas y un buen manejo de tus emociones. Es valioso "
-                "que identifiques qué está funcionando para ti en este momento.\n\n"
-                "Este es un excelente momento para fortalecer tus recursos emocionales y desarrollar "
-                "habilidades que puedas usar cuando enfrentes desafíos futuros. La resiliencia se "
-                "construye tanto en los buenos momentos como en los difíciles."
-            ),
+            "mensaje": """🌟 ¡Me alegra que te sientas bien!
+
+Es importante reconocer y fortalecer lo que funciona. El bienestar es resultado de tus acciones.
+
+¿Qué fortalecemos hoy?""",
+            
             "opciones": [
                 {
-                    "type": "consolidacion",
-                    "label": "Quiero identificar qué me hace sentir bien",
-                    "descripcion": "Reconozcamos tus fortalezas y recursos personales"
+                    "id": "gratitud_bien",
+                    "label": "🙏 Ejercicio de gratitud",
+                    "contenido": """🙏 GRATITUD DIARIA
+
+Escribe 3 cosas específicas:
+
+1. Algo pequeño que disfrutaste hoy:
+_______________________
+
+2. Algo que alguien hizo por ti:
+_______________________
+
+3. Algo sobre ti que aprecias:
+_______________________
+
+DESAFÍO 7 DÍAS:
+Cada noche, 3 cosas diferentes.
+
+Resultado: Tu cerebro buscará automáticamente cosas buenas. 🙏"""
                 },
+                
                 {
-                    "type": "gratitud",
-                    "label": "Practicar gratitud y valorar lo positivo",
-                    "descripcion": "La gratitud fortalece el bienestar emocional a largo plazo"
+                    "id": "fortalezas_bien",
+                    "label": "💪 Identificar mis fortalezas",
+                    "contenido": """💪 TUS FORTALEZAS
+
+Marca las que reconoces:
+
+□ Curiosidad
+□ Perseverancia
+□ Honestidad
+□ Bondad
+□ Valentía
+□ Creatividad
+□ Gratitud
+□ Humor
+□ Liderazgo
+□ Prudencia
+
+TUS TOP 3:
+1. _______________________
+2. _______________________
+3. _______________________
+
+DESAFÍO: Usa una de forma nueva esta semana.
+
+Tus fortalezas son tu superpoder. 💪"""
                 },
+                
                 {
-                    "type": "prevencion",
-                    "label": "Prepararme para futuros desafíos",
-                    "descripcion": "Desarrollemos un plan de acción para mantener tu bienestar"
+                    "id": "mantener_bien",
+                    "label": "🔐 Mantener este bienestar",
+                    "contenido": """🔐 PROTEGE TU BIENESTAR
+
+¿QUÉ ESTÁ FUNCIONANDO?
+_______________________
+
+3 HÁBITOS NO NEGOCIABLES:
+1. _______________________
+2. _______________________
+3. _______________________
+
+SEÑALES DE ALERTA (actúa aquí):
+□ Pospongo actividades
+□ Duermo mal
+□ Evito gente
+□ Más irritable
+
+SI BAJO DE ÁNIMO:
+Paso 1 (24h): _______________________
+Paso 2 (2-3 días): _______________________
+Paso 3 (1 semana): Contactar Bienestar
+
+Mantener es más fácil que recuperar. 🔐"""
                 },
+                
                 {
-                    "type": "compartir",
-                    "label": "Reflexionar sobre mi progreso personal",
-                    "descripcion": "Celebremos tus logros y aprendizajes recientes"
+                    "id": "recurso_bien",
+                    "label": "📖 Ciencia del bienestar (PERMA)",
+                    "contenido": """📖 FÓRMULA DEL BIENESTAR
+
+P - Emociones Positivas (alegría, gratitud)
+E - Compromiso (flow, usar fortalezas)
+R - Relaciones (conexiones significativas)
+M - Significado (propósito)
+A - Logros (metas, progreso)
+
+EVALÚA (1-10):
+P: __ E: __ R: __ M: __ A: __
+
+¿Cuál necesita más atención?
+_______________________
+
+ACCIÓN HOY:
+_______________________
+
+Bienestar = cultivar estas 5 áreas. 📖"""
                 }
             ]
         },
         
         "muy_bien": {
-            "mensaje": (
-                "¡Qué maravilloso que te sientas muy bien en este momento! Tu estado emocional "
-                "positivo es un reflejo de que muchas cosas están funcionando correctamente en tu "
-                "vida: tus pensamientos son más equilibrados, tus acciones te están acercando a tus "
-                "valores, y tu bienestar está en un buen lugar.\n\n"
-                "Es fundamental que reconozcas este estado y valores lo que has hecho para llegar "
-                "aquí. Cada momento de bienestar es una evidencia de tu capacidad de cuidarte y de "
-                "construir una vida significativa.\n\n"
-                "Este es el momento perfecto para consolidar tus fortalezas, agradecer tu esfuerzo, "
-                "y prepararte emocionalmente para el futuro. El bienestar sostenible no es estar "
-                "siempre feliz, sino tener las herramientas para navegar todas las emociones con "
-                "sabiduría y compasión hacia ti mismo/a."
-            ),
+            "mensaje": """✨ ¡Qué maravilloso que te sientas muy bien!
+
+Tu bienestar refleja que muchas cosas están funcionando. Vamos a consolidar y celebrar.
+
+¿Qué hacemos?""",
+            
             "opciones": [
                 {
-                    "type": "celebracion",
-                    "label": "Quiero celebrar y reconocer mis logros",
-                    "descripcion": "Valoremos conscientemente tu progreso y tus fortalezas"
+                    "id": "respiracion_celebracion",
+                    "label": "🌟 Respiración de celebración",
+                    "contenido": """🌟 RESPIRACIÓN DE GRATITUD
+
+Siéntate cómodo. Cierra los ojos.
+
+INHALA (5 seg): Imagina luz dorada llenando tu cuerpo
+EXHALA (5 seg): Sonríe suavemente, siente gratitud
+
+Repite 5 veces, pensando:
+"Estoy aquí. Estoy bien. Estoy agradecido/a."
+
+Siente tu corazón. Siente tu fuerza.
+
+Este momento es tuyo. Celébralo. 🌟"""
                 },
+                
                 {
-                    "type": "profundizacion",
-                    "label": "Explorar qué factores contribuyen a mi bienestar",
-                    "descripcion": "Identifiquemos los elementos clave de tu felicidad para mantenerlos"
+                    "id": "consejo_celebracion",
+                    "label": "🎉 Celebrar mis logros",
+                    "contenido": """🎉 RECONOCE TU PROGRESO
+
+LOGROS RECIENTES:
+• _______________________
+• _______________________
+• _______________________
+
+QUÉ HICISTE PARA LLEGAR AQUÍ:
+_______________________
+
+LECCIÓN APRENDIDA:
+_______________________
+
+MENSAJE PARA TI:
+
+Has trabajado duro. Has crecido. Has resistido.
+
+Tu valor NO depende de:
+✗ Calificaciones
+✗ Productividad
+✗ Aprobación de otros
+
+Tu valor es inherente. Existes = importas.
+
+Sigue adelante. 🎉"""
                 },
+                
                 {
-                    "type": "ayudar_otros",
-                    "label": "Usar mi bienestar para ayudar a otros",
-                    "descripcion": "Cuando estamos bien, podemos ser fuente de apoyo para quienes nos rodean"
+                    "id":" meditacion_compasion",
+                    "label": "💝 Meditación de autocompasión",
+                    "contenido": """💝 AUTOCOMPASIÓN
+
+Siéntate cómodo. Mano en tu corazón.
+
+Repite mentalmente:
+
+"Estoy orgulloso/a de mí."
+"He hecho lo mejor que puedo."
+"Merezco amabilidad, incluida la mía."
+"Celebro quien soy hoy."
+
+Respira profundo. Siente el calor de tu mano.
+
+Eres suficiente. Siempre lo has sido. 💝"""
                 },
+                
                 {
-                    "type": "plan_mantenimiento",
-                    "label": "Crear un plan para mantener este bienestar",
-                    "descripcion": "Desarrollemos estrategias concretas para preservar tu estado positivo"
+                    "id": "compartir_bien",
+                    "label": "🤝 Compartir mi bienestar con otros",
+                    "contenido": """🤝 COMPARTIR TU LUZ
+
+Cuando estás bien, puedes ayudar a otros.
+
+IDEAS:
+□ Envía un mensaje amable a alguien
+□ Pregunta de verdad "¿cómo estás?"
+□ Comparte lo que te ha ayudado
+□ Ofrece tu tiempo/escucha
+□ Sonríe a alguien hoy
+
+ACCIÓN HOY:
+_______________________
+
+Tu bienestar puede inspirar a otros.
+
+Brilla. 🤝"""
                 }
             ]
         }
@@ -196,125 +534,24 @@ def get_emotion_options(emotion: EmotionType) -> dict:
 
 
 def respond_free_text(text: str) -> str:
-    """
-    Respuesta empática y profesional a texto libre del usuario.
-    Basada en validación emocional y principios de terapia cognitivo-conductual.
-    """
+    """Respuesta a texto libre con detección de crisis"""
     
-    # Detectar palabras clave de crisis
-    crisis_keywords = [
-        "suicidio", "matarme", "morir", "acabar", "terminar todo",
-        "no quiero vivir", "mejor muerto", "hacerme daño"
-    ]
-    
-    text_lower = text.lower()
-    is_crisis = any(keyword in text_lower for keyword in crisis_keywords)
-    
-    if is_crisis:
-        return (
-            "🆘 **ESTO ES IMPORTANTE**\n\n"
-            "Lamento mucho que estés pasando por tanto dolor en este momento. Lo que sientes "
-            "es real y entiendo que debe ser abrumador.\n\n"
-            "**Por favor, busca ayuda profesional AHORA:**\n"
-            "• 📞 Línea 106 - Línea de la vida (24/7, gratuita)\n"
-            "• 📧 bienestar@ucatolica.edu.co - Bienestar Universitario\n"
-            "• 🚨 123 - Línea de emergencias\n\n"
-            "No estás solo/a. Hay personas capacitadas esperando ayudarte en este momento. "
-            "Tu vida tiene valor y mereces recibir el apoyo adecuado.\n\n"
-            "Si estás en peligro inmediato, dirígete al servicio de urgencias más cercano o "
-            "llama al 123."
-        )
-    
-    # Detectar emociones en el texto
-    emotional_words = {
-        "ansiedad": ["ansiedad", "ansioso", "ansiosa", "nervioso", "nerviosa", "pánico", "preocupado"],
-        "tristeza": ["triste", "deprimido", "deprimida", "solo", "sola", "vacío", "desesperado"],
-        "enojo": ["enojado", "enojada", "furioso", "furiosa", "molesto", "molesta", "frustrado"],
-        "miedo": ["miedo", "temor", "asustado", "asustada", "terror", "pánico"],
-        "soledad": ["solo", "sola", "abandonado", "abandonada", "aislado", "aislada"]
-    }
-    
-    detected_emotion = None
-    for emotion, keywords in emotional_words.items():
-        if any(keyword in text_lower for keyword in keywords):
-            detected_emotion = emotion
-            break
-    
-    # Respuestas empáticas personalizadas
-    if detected_emotion == "ansiedad":
-        return (
-            "Noto en tus palabras que estás experimentando ansiedad, y quiero que sepas que "
-            "entiendo lo difícil que puede ser. La ansiedad es una respuesta natural de tu cuerpo "
-            "ante situaciones que percibe como amenazantes, pero a veces puede activarse incluso "
-            "cuando no hay peligro real.\n\n"
-            "**Lo que podemos hacer juntos:**\n"
-            "1. **Ahora mismo**: Practica respiración diafragmática (inhala 4 segundos, sostén 4, "
-            "exhala 6). Esto activa tu sistema nervioso parasimpático y te ayuda a calmarte.\n\n"
-            "2. **Identificar pensamientos**: ¿Qué pensamientos están alimentando tu ansiedad? "
-            "A menudo son predicciones catastróficas del futuro. Escribirlos puede ayudarte a verlos "
-            "con más claridad.\n\n"
-            "3. **Anclar al presente**: Nombra 5 cosas que ves, 4 que tocas, 3 que oyes, 2 que hueles "
-            "y 1 que saboreas. Esto te devuelve al aquí y ahora.\n\n"
-            "Recuerda: La ansiedad es incómoda pero no peligrosa. Puedes sentir ansiedad y aún así "
-            "estar seguro/a. ¿Te gustaría que profundicemos en alguna de estas estrategias?"
-        )
-    
-    elif detected_emotion == "tristeza":
-        return (
-            "Gracias por confiar en mí y compartir tu tristeza. Puedo sentir en tus palabras que "
-            "estás atravesando un momento difícil, y quiero validar esa experiencia: tu tristeza "
-            "es real, es válida, y tiene sentido.\n\n"
-            "La tristeza nos enseña sobre nuestros valores y sobre lo que es importante para nosotros. "
-            "Aunque duela, también es una señal de tu humanidad y de tu capacidad para conectar "
-            "profundamente con la vida.\n\n"
-            "**Algunas reflexiones que pueden ayudarte:**\n"
-            "• Los sentimientos, incluso los dolorosos, son temporales. Lo que sientes hoy no "
-            "es lo que sentirás siempre.\n"
-            "• La tristeza no significa que algo esté 'mal' contigo. Eres una persona completa "
-            "que está viviendo una experiencia humana difícil.\n"
-            "• Pequeñas acciones pueden ayudar: dar un paseo, hablar con alguien de confianza, "
-            "escuchar música, escribir tus sentimientos.\n\n"
-            "¿Te gustaría hablar sobre qué situación o pensamiento está contribuyendo a tu tristeza? "
-            "A veces, ponerlo en palabras ayuda a procesarlo mejor."
-        )
-    
-    elif detected_emotion == "soledad":
-        return (
-            "Siento que estás experimentando soledad en este momento, y quiero que sepas que "
-            "tu sentimiento es completamente comprensible. La soledad puede ser una de las experiencias "
-            "más dolorosas, porque como seres humanos estamos diseñados para la conexión.\n\n"
-            "Es importante distinguir entre estar físicamente solo/a y sentirse solo/a emocionalmente. "
-            "A veces podemos estar rodeados de gente y aún sentirnos solos si no tenemos conexiones "
-            "auténticas y significativas.\n\n"
-            "**Lo que es importante recordar:**\n"
-            "• La soledad es una señal, no una sentencia. Te está diciendo que necesitas conexión, "
-            "y eso es información valiosa.\n"
-            "• Estás dando un paso importante al comunicarte aquí. Buscar ayuda es ya una forma "
-            "de romper el aislamiento.\n"
-            "• Hay recursos disponibles: Bienestar Universitario ofrece grupos de apoyo donde "
-            "puedes conectar con otros estudiantes que comparten experiencias similares.\n\n"
-            "¿Te gustaría explorar maneras concretas de construir conexiones más profundas, o "
-            "preferirías hablar más sobre lo que estás sintiendo?"
-        )
+    # Detectar crisis
+    if detect_crisis(text):
+        return get_crisis_response()
     
     # Respuesta general empática
-    return (
-        "Gracias por confiar en mí y compartir lo que estás sintiendo. He leído tus palabras "
-        "con atención y quiero que sepas que lo que experimentas es importante y merece ser escuchado.\n\n"
-        "En la terapia cognitivo-conductual, creemos que hay una relación profunda entre lo que "
-        "pensamos, lo que sentimos y cómo actuamos. A veces, nuestros pensamientos automáticos "
-        "pueden intensificar nuestras emociones de maneras que no nos ayudan.\n\n"
-        "**Algunas preguntas para reflexionar:**\n"
-        "• ¿Qué pensamientos han estado pasando por tu mente últimamente?\n"
-        "• ¿Hay alguna situación específica que haya desencadenado cómo te sientes?\n"
-        "• ¿Qué necesitarías en este momento para sentirte un poco mejor o más apoyado/a?\n\n"
-        "Recuerda que:\n"
-        "✓ Tus emociones son válidas, sin importar cuáles sean\n"
-        "✓ No tienes que enfrentar esto solo/a - hay recursos y personas que quieren ayudarte\n"
-        "✓ Pequeños pasos cuentan: cada momento de autocuidado es valioso\n"
-        "✓ Está bien no estar bien todo el tiempo\n\n"
-        "Si sientes que necesitas apoyo más profundo, te animo a contactar con Bienestar "
-        "Universitario (bienestar@ucatolica.edu.co). Ellos pueden ofrecerte acompañamiento "
-        "psicológico profesional personalizado.\n\n"
-        "Estoy aquí para escucharte. ¿Hay algo específico en lo que te gustaría que te ayudara hoy?"
-    )
+    return """Gracias por confiar en Serena y compartir lo que sientes.
+
+Tus emociones son válidas. No tienes que enfrentarlo solo/a.
+
+RECURSOS:
+• Bienestar: bienestar@ucatolica.edu.co
+• Línea 106 (24/7)
+
+RECUERDA:
+✓ Está bien no estar bien
+✓ Pedir ayuda es valentía
+✓ Pequeños pasos cuentan
+
+¿Hay algo específico en lo que te gustaría que te ayude hoy?"""

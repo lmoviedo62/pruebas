@@ -17,7 +17,6 @@
       min-height: 100vh;
     }
 
-    /* Navbar superior */
     .navbar {
       background: linear-gradient(90deg, #8b5cf6, #a855f7);
       padding: 16px 0;
@@ -38,15 +37,11 @@
       font-size: 22px;
       font-weight: 700;
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
 
     .navbar-links {
       display: flex;
       gap: 24px;
-      align-items: center;
     }
 
     .navbar-links a {
@@ -54,23 +49,21 @@
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      transition: opacity 0.2s;
       padding: 8px 16px;
       border-radius: 8px;
+      transition: background 0.2s;
     }
 
     .navbar-links a:hover {
       background: rgba(255, 255, 255, 0.15);
     }
 
-    /* Contenedor principal */
     .container {
       max-width: 1000px;
       margin: 0 auto;
       padding: 32px 20px;
     }
 
-    /* Intro card */
     .intro-card {
       background: white;
       border-radius: 16px;
@@ -84,9 +77,6 @@
       color: #1f2937;
       font-size: 20px;
       margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
 
     .intro-card p {
@@ -95,7 +85,7 @@
       font-size: 14px;
     }
 
-    .intro-card .disclaimer {
+    .disclaimer {
       background: #fef3c7;
       border-left: 3px solid #f59e0b;
       padding: 12px;
@@ -105,7 +95,6 @@
       color: #92400e;
     }
 
-    /* Card del chat */
     .chat-card {
       background: white;
       border-radius: 16px;
@@ -130,25 +119,8 @@
       font-size: 20px;
       color: #8b5cf6;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .status-indicator {
-      width: 10px;
-      height: 10px;
-      background: #10b981;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    /* Botones de emociones */
     .emotion-section {
       margin-bottom: 20px;
     }
@@ -176,9 +148,6 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .emotion-btn:hover {
@@ -186,52 +155,21 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .emotion-btn.muy-mal {
-      color: #dc2626;
-      border-color: #dc2626;
-    }
+    .emotion-btn.muy-mal { color: #dc2626; border-color: #dc2626; }
+    .emotion-btn.muy-mal:hover { background: #fee2e2; }
+    
+    .emotion-btn.triste { color: #f59e0b; border-color: #f59e0b; }
+    .emotion-btn.triste:hover { background: #fef3c7; }
+    
+    .emotion-btn.neutral { color: #6b7280; border-color: #6b7280; }
+    .emotion-btn.neutral:hover { background: #f3f4f6; }
+    
+    .emotion-btn.bien { color: #10b981; border-color: #10b981; }
+    .emotion-btn.bien:hover { background: #d1fae5; }
+    
+    .emotion-btn.muy-bien { color: #3b82f6; border-color: #3b82f6; }
+    .emotion-btn.muy-bien:hover { background: #dbeafe; }
 
-    .emotion-btn.muy-mal:hover {
-      background: #fee2e2;
-    }
-
-    .emotion-btn.triste {
-      color: #f59e0b;
-      border-color: #f59e0b;
-    }
-
-    .emotion-btn.triste:hover {
-      background: #fef3c7;
-    }
-
-    .emotion-btn.neutral {
-      color: #6b7280;
-      border-color: #6b7280;
-    }
-
-    .emotion-btn.neutral:hover {
-      background: #f3f4f6;
-    }
-
-    .emotion-btn.bien {
-      color: #10b981;
-      border-color: #10b981;
-    }
-
-    .emotion-btn.bien:hover {
-      background: #d1fae5;
-    }
-
-    .emotion-btn.muy-bien {
-      color: #3b82f6;
-      border-color: #3b82f6;
-    }
-
-    .emotion-btn.muy-bien:hover {
-      background: #dbeafe;
-    }
-
-    /* Área de chat */
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -248,23 +186,12 @@
     }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .message.serena {
-      text-align: left;
-    }
-
-    .message.user {
-      text-align: right;
-    }
+    .message.serena { text-align: left; }
+    .message.user { text-align: right; }
 
     .message-content {
       display: inline-block;
@@ -295,7 +222,32 @@
       font-weight: 600;
     }
 
-    /* Input de mensaje */
+    /* Botones de opciones */
+    .option-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .option-btn {
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #8b5cf6, #a855f7);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+
+    .option-btn:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+
     .input-area {
       display: flex;
       gap: 12px;
@@ -321,11 +273,6 @@
       box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
     }
 
-    .chat-input::placeholder {
-      color: #9ca3af;
-    }
-
-    /* Botón enviar */
     .btn-send {
       padding: 12px 24px;
       background: linear-gradient(135deg, #8b5cf6, #a855f7);
@@ -336,10 +283,6 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
     }
 
     .btn-send:hover {
@@ -347,121 +290,17 @@
       box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
     }
 
-    .btn-send:active {
-      transform: translateY(0);
-    }
-
-    .btn-send:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Typing indicator */
-    .typing-indicator {
-      display: none;
-      padding: 12px;
-      margin-bottom: 16px;
-    }
-
-    .typing-indicator.active {
-      display: block;
-    }
-
-    .typing-dots {
-      display: inline-flex;
-      gap: 4px;
-    }
-
-    .typing-dots span {
-      width: 8px;
-      height: 8px;
-      background: #8b5cf6;
-      border-radius: 50%;
-      animation: typing 1.4s infinite;
-    }
-
-    .typing-dots span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .typing-dots span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes typing {
-      0%, 60%, 100% {
-        transform: translateY(0);
-        opacity: 0.7;
-      }
-      30% {
-        transform: translateY(-10px);
-        opacity: 1;
-      }
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-      .emotion-buttons {
-        flex-direction: column;
-      }
-
-      .emotion-btn {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .message-content {
-        max-width: 90%;
-      }
-
-      .input-area {
-        flex-direction: column;
-      }
-
-      .btn-send {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .navbar-links {
-        gap: 12px;
-      }
-
-      .navbar-links a {
-        font-size: 13px;
-        padding: 6px 12px;
-      }
-    }
-
-    /* Scrollbar personalizado */
-    .chat-messages::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .chat-messages::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-
-    .chat-messages::-webkit-scrollbar-thumb {
-      background: #8b5cf6;
-      border-radius: 10px;
-    }
-
-    .chat-messages::-webkit-scrollbar-thumb:hover {
-      background: #7c3aed;
+      .emotion-buttons { flex-direction: column; }
+      .emotion-btn { width: 100%; justify-content: center; }
+      .message-content { max-width: 90%; }
     }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
   <nav class="navbar">
     <div class="navbar-content">
-      <a href="/" class="navbar-brand">
-        <span>💜</span>
-        <span>Serena</span>
-      </a>
+      <a href="/" class="navbar-brand">💜 Serena</a>
       <div class="navbar-links">
         <a href="/panel">Panel</a>
         <a href="/chat">Chat</a>
@@ -470,19 +309,13 @@
     </div>
   </nav>
 
-  <!-- Contenido principal -->
   <div class="container">
-    <!-- Intro card -->
     <div class="intro-card">
-      <h2>
-        <span>🤗</span>
-        <span>Bienvenido/a al espacio de apoyo emocional</span>
-      </h2>
+      <h2>🤗 Bienvenido/a al espacio de apoyo emocional</h2>
       <p>
         Soy Serena, tu asistente de apoyo emocional. Estoy aquí para escucharte sin juzgarte, 
         validar tus emociones y ayudarte a explorar estrategias basadas en psicología 
-        cognitivo-conductual. Puedes compartir cómo te sientes hoy seleccionando una emoción 
-        o escribiéndome directamente.
+        cognitivo-conductual.
       </p>
       <div class="disclaimer">
         <strong>⚠️ Importante:</strong> Soy una herramienta de apoyo inicial, no reemplazo 
@@ -491,68 +324,33 @@
       </div>
     </div>
 
-    <!-- Card del chat -->
     <div class="chat-card">
-      <!-- Header -->
       <div class="chat-header">
-        <div class="chat-title">
-          <div class="status-indicator"></div>
-          <span>Conversación con Serena</span>
-        </div>
+        <div class="chat-title">Conversación con Serena</div>
       </div>
 
-      <!-- Sección de emociones -->
       <div class="emotion-section">
         <label class="emotion-label">¿Cómo te sientes en este momento?</label>
         <div class="emotion-buttons">
-          <button class="emotion-btn muy-mal" data-emotion="muy_mal">
-            <span>😢</span>
-            <span>Muy mal</span>
-          </button>
-          <button class="emotion-btn triste" data-emotion="triste">
-            <span>😔</span>
-            <span>Triste</span>
-          </button>
-          <button class="emotion-btn neutral" data-emotion="neutral">
-            <span>😐</span>
-            <span>Neutral</span>
-          </button>
-          <button class="emotion-btn bien" data-emotion="bien">
-            <span>🙂</span>
-            <span>Bien</span>
-          </button>
-          <button class="emotion-btn muy-bien" data-emotion="muy_bien">
-            <span>😊</span>
-            <span>Muy bien</span>
-          </button>
+          <button class="emotion-btn muy-mal" data-emotion="muy_mal">😢 Muy mal</button>
+          <button class="emotion-btn triste" data-emotion="triste">😔 Triste</button>
+          <button class="emotion-btn neutral" data-emotion="neutral">😐 Neutral</button>
+          <button class="emotion-btn bien" data-emotion="bien">🙂 Bien</button>
+          <button class="emotion-btn muy-bien" data-emotion="muy_bien">😊 Muy bien</button>
         </div>
       </div>
 
-      <!-- Área de mensajes -->
       <div class="chat-messages" id="chatMessages">
         <div class="message serena">
           <div class="message-sender">💜 Serena</div>
-          <div class="message-content">
-Hola, soy Serena. Estoy aquí para acompañarte y escucharte.
+          <div class="message-content">Hola, soy Serena. Estoy aquí para acompañarte y escucharte.
 
 En este espacio seguro y confidencial, puedes expresar lo que sientes sin miedo a ser juzgado/a. Todas tus emociones son válidas y tienen sentido.
 
-¿Cómo te sientes hoy? Puedes seleccionar una emoción arriba o escribirme directamente lo que necesites compartir.
-          </div>
+¿Cómo te sientes hoy? Puedes seleccionar una emoción arriba o escribirme directamente lo que necesites compartir.</div>
         </div>
       </div>
 
-      <!-- Typing indicator -->
-      <div class="typing-indicator" id="typingIndicator">
-        <div class="message-sender">💜 Serena está escribiendo...</div>
-        <div class="typing-dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-
-      <!-- Input de mensaje -->
       <div class="input-area">
         <textarea 
           id="chatInput" 
@@ -560,10 +358,7 @@ En este espacio seguro y confidencial, puedes expresar lo que sientes sin miedo 
           placeholder="Escribe aquí lo que sientes o necesitas compartir..."
           rows="1"
         ></textarea>
-        <button id="chatSend" class="btn-send">
-          <span>Enviar</span>
-          <span>📤</span>
-        </button>
+        <button id="chatSend" class="btn-send">Enviar 📤</button>
       </div>
     </div>
   </div>
@@ -573,73 +368,9 @@ En este espacio seguro y confidencial, puedes expresar lo que sientes sin miedo 
     const chatMessages = document.getElementById("chatMessages");
     const chatInput = document.getElementById("chatInput");
     const chatSend = document.getElementById("chatSend");
-    const typingIndicator = document.getElementById("typingIndicator");
-
-    // Mapeo de respuestas empáticas (simulación - en producción vendrían del backend)
-    const emotionResponses = {
-      muy_mal: `Lamento mucho que te sientas así en este momento. Lo que estás experimentando es válido y tiene sentido. Cuando nos sentimos muy mal, nuestro cuerpo y mente nos están enviando una señal importante de que algo necesita atención.
-
-Quiero que sepas que no estás solo/a en esto. Muchas personas atraviesan momentos difíciles, y buscar apoyo es un acto de valentía y autocuidado. Tu bienestar es importante y mereces sentirte mejor.
-
-Antes de continuar, quiero preguntarte: ¿Te sientes en peligro inmediato o has pensado en hacerte daño? Si es así, es fundamental que contactes de inmediato con Bienestar Universitario (bienestar@ucatolica.edu.co) o la Línea 106 (disponible 24/7).
-
-¿En qué puedo ayudarte ahora? Puedo ofrecerte:
-• Un ejercicio de respiración para calmar tu sistema nervioso
-• Espacio para hablar sobre lo que sientes
-• Información sobre recursos de ayuda profesional
-• Ayuda para identificar y trabajar con pensamientos que aumentan tu malestar`,
-
-      triste: `Entiendo que estás pasando por un momento de tristeza. La tristeza es una emoción humana completamente natural y válida; nos conecta con lo que valoramos y nos muestra qué es importante para nosotros.
-
-A veces, cuando estamos tristes, nuestros pensamientos pueden volverse más negativos de lo que la realidad merece. Es como si lleváramos puestos unos 'lentes oscuros' que filtran nuestra percepción. Parte de mi trabajo es ayudarte a reconocer estos patrones y encontrar una perspectiva más equilibrada.
-
-Recuerda: sentir tristeza no significa debilidad. Significa que eres humano/a y que tu experiencia emocional es rica y compleja. Estoy aquí para acompañarte.
-
-¿Te gustaría:
-• Explorar de dónde viene esta tristeza
-• Que te sugiera actividades para sentirte mejor
-• Practicar una meditación de aceptación
-• Trabajar en ver las cosas desde otra perspectiva`,
-
-      neutral: `Gracias por compartir cómo te sientes. Estar en un estado neutral también es válido y puede ser un buen momento para reflexionar y fortalecerte emocionalmente.
-
-A veces, la neutralidad puede significar calma y estabilidad, otras veces puede ser señal de desconexión emocional o de estar 'en pausa'. Ambas son experiencias comunes y está bien sentirse así.
-
-Este puede ser un momento ideal para desarrollar herramientas de autocuidado, explorar tus patrones de pensamiento, o simplemente practicar habilidades que te preparen para cuando vengan momentos más desafiantes.
-
-¿Te interesaría:
-• Conocerte mejor emocionalmente
-• Aprender herramientas de afrontamiento
-• Practicar mindfulness
-• Establecer metas de bienestar personal`,
-
-      bien: `¡Me alegra mucho saber que te sientes bien! Es importante reconocer y celebrar estos momentos positivos. A veces, cuando las cosas van bien, tendemos a no prestarles atención, pero son igual de valiosos que los momentos difíciles.
-
-Sentirse bien no es casualidad: generalmente es el resultado de pensamientos más equilibrados, acciones constructivas y un buen manejo de tus emociones. Es valioso que identifiques qué está funcionando para ti en este momento.
-
-Este es un excelente momento para fortalecer tus recursos emocionales y desarrollar habilidades que puedas usar cuando enfrentes desafíos futuros.
-
-Podemos trabajar en:
-• Identificar qué factores contribuyen a tu bienestar
-• Practicar gratitud
-• Prepararte para futuros desafíos
-• Reflexionar sobre tu progreso personal`,
-
-      muy_bien: `¡Qué maravilloso que te sientas muy bien en este momento! Tu estado emocional positivo es un reflejo de que muchas cosas están funcionando correctamente en tu vida: tus pensamientos son más equilibrados, tus acciones te están acercando a tus valores, y tu bienestar está en un buen lugar.
-
-Es fundamental que reconozcas este estado y valores lo que has hecho para llegar aquí. Cada momento de bienestar es una evidencia de tu capacidad de cuidarte y de construir una vida significativa.
-
-Este es el momento perfecto para consolidar tus fortalezas, agradecer tu esfuerzo, y prepararte emocionalmente para el futuro.
-
-¿Te gustaría:
-• Celebrar y reconocer tus logros
-• Explorar qué factores contribuyen a tu bienestar
-• Pensar en cómo ayudar a otros desde tu bienestar
-• Crear un plan para mantener este estado positivo`
-    };
 
     // Función para agregar mensaje
-    function addMessage(text, sender) {
+    function addMessage(text, sender, options = null) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${sender}`;
       
@@ -653,45 +384,74 @@ Este es el momento perfecto para consolidar tus fortalezas, agradecer tu esfuerz
       
       messageDiv.appendChild(senderDiv);
       messageDiv.appendChild(contentDiv);
-      chatMessages.appendChild(messageDiv);
       
-      // Scroll al final
+      // Si hay opciones, agregar botones
+      if (options && options.length > 0) {
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'option-buttons';
+        
+        options.forEach(option => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = option.label;
+          btn.onclick = () => showOptionContent(option);
+          optionsDiv.appendChild(btn);
+        });
+        
+        contentDiv.appendChild(optionsDiv);
+      }
+      
+      chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Función para mostrar typing indicator
-    function showTyping() {
-      typingIndicator.classList.add('active');
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function hideTyping() {
-      typingIndicator.classList.remove('active');
-    }
-
-    // Simular respuesta de Serena con delay
-    function respondAsSerena(text) {
-      showTyping();
+    // Función para mostrar contenido de opción
+    function showOptionContent(option) {
+      addMessage(`Seleccioné: ${option.label}`, 'user');
       
       setTimeout(() => {
-        hideTyping();
-        addMessage(text, 'serena');
-      }, 1500 + Math.random() * 1000);
+        addMessage(option.contenido, 'serena');
+      }, 500);
     }
 
     // Manejar clic en botones de emoción
     emotionButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", async () => {
         const emotion = btn.dataset.emotion;
         const emotionText = btn.textContent.trim();
         
         addMessage(`Seleccioné: ${emotionText}`, 'user');
-        respondAsSerena(emotionResponses[emotion]);
+        
+        try {
+          // ✅ Enviar la emoción como string en el body
+          const response = await fetch('/api/v1/chatbot/emotion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(`"${emotion}"`)  // Formato: "muy_mal"
+          });
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error del servidor:', errorText);
+            throw new Error('Error en la respuesta del servidor');
+          }
+          
+          const data = await response.json();
+          
+          console.log('✅ Respuesta recibida:', data);
+          
+          // Agregar mensaje con opciones
+          addMessage(data.mensaje, 'serena', data.opciones);
+          
+        } catch (error) {
+          console.error('❌ Error completo:', error);
+          addMessage('Hubo un error al procesar tu solicitud. Por favor intenta de nuevo.', 'serena');
+        }
       });
     });
 
     // Función para enviar mensaje
-    function sendMessage() {
+    async function sendMessage() {
       const text = chatInput.value.trim();
       if (!text) return;
       
@@ -699,22 +459,20 @@ Este es el momento perfecto para consolidar tus fortalezas, agradecer tu esfuerz
       chatInput.value = "";
       chatInput.style.height = 'auto';
       
-      // Respuesta empática general
-      const response = `Gracias por confiar en mí y compartir lo que estás sintiendo. He leído tus palabras con atención y quiero que sepas que lo que experimentas es importante y merece ser escuchado.
-
-En la terapia cognitivo-conductual, creemos que hay una relación profunda entre lo que pensamos, lo que sentimos y cómo actuamos. A veces, nuestros pensamientos automáticos pueden intensificar nuestras emociones de maneras que no nos ayudan.
-
-Algunas cosas para recordar:
-✓ Tus emociones son válidas, sin importar cuáles sean
-✓ No tienes que enfrentar esto solo/a - hay recursos disponibles
-✓ Pequeños pasos cuentan: cada momento de autocuidado es valioso
-✓ Está bien no estar bien todo el tiempo
-
-Si sientes que necesitas apoyo más profundo, te animo a contactar con Bienestar Universitario (bienestar@ucatolica.edu.co).
-
-¿Hay algo específico en lo que te gustaría que te ayudara hoy?`;
-      
-      respondAsSerena(response);
+      try {
+        const response = await fetch('/api/v1/chatbot/free-text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        
+        const data = await response.json();
+        addMessage(data.reply, 'serena');
+        
+      } catch (error) {
+        console.error('Error:', error);
+        addMessage('Hubo un error al procesar tu mensaje. Por favor intenta de nuevo.', 'serena');
+      }
     }
 
     // Event listeners
