@@ -179,6 +179,8 @@
             // Usuario está logueado
             userSection.classList.remove('d-none-custom');
             userSection.style.display = 'flex';
+            
+            console.log("✅ Usuario autenticado en navbar");
         } else {
             // Usuario no está logueado
             if (userSection) {
@@ -194,9 +196,6 @@
         checkAuth();
     }
 
-    // También ejecutar después de un pequeño delay por si acaso
-    setTimeout(checkAuth, 100);
-
     // Event listener para el botón de logout
     document.addEventListener('DOMContentLoaded', function() {
         const logoutBtn = document.getElementById('logout-btn');
@@ -205,7 +204,6 @@
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 
-                // Confirmar antes de cerrar sesión
                 if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
                     logout();
                 }
@@ -219,7 +217,6 @@
         
         if (token) {
             try {
-                // Llamar al endpoint de logout
                 await fetch('/api/v1/auth/logout', {
                     method: 'POST',
                     headers: {
@@ -228,7 +225,7 @@
                     }
                 });
             } catch (err) {
-                console.error('Error al cerrar sesión en el servidor:', err);
+                console.error('Error al cerrar sesión:', err);
             }
         }
         
@@ -236,14 +233,13 @@
         localStorage.removeItem('token');
         localStorage.removeItem('user_email');
         
-        // Mostrar mensaje
-        alert('Sesión cerrada exitosamente');
+        console.log("✅ Sesión cerrada, redirigiendo...");
         
         // Redirigir a la página principal
-        window.location.href = '/';
+        window.location.replace('/');
     }
-})();</script>
-
+})();
+</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

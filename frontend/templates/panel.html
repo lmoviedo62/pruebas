@@ -71,14 +71,27 @@
 
 {% block extra_js %}
 <script>
-// Verificar que el usuario esté autenticado
-document.addEventListener('DOMContentLoaded', function() {
+// ✅ VERIFICACIÓN MEJORADA DE AUTENTICACIÓN
+(function() {
+    console.log("🔍 Verificando autenticación...");
+    
     const token = localStorage.getItem('token');
+    const userEmail = localStorage.getItem('user_email');
+    
+    console.log("Token encontrado:", token ? "✅ SÍ" : "❌ NO");
+    console.log("Email encontrado:", userEmail ? "✅ SÍ" : "❌ NO");
     
     // Si no hay token, redirigir al login
-    if (!token) {
-        window.location.href = '/login';
+    if (!token || !userEmail) {
+        console.log("⚠️ No hay autenticación, redirigiendo a login...");
+        setTimeout(() => {
+            window.location.replace('/login');
+        }, 100);
+        return;
     }
-});
+    
+    console.log("✅ Usuario autenticado correctamente");
+    console.log("📧 Email del usuario:", userEmail);
+})();
 </script>
 {% endblock %}
