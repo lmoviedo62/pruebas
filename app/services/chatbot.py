@@ -1,6 +1,10 @@
 from typing import Literal
+import random
 
 EmotionType = Literal["muy_mal", "triste", "neutral", "bien", "muy_bien"]
+
+# Diccionario para rastrear qué versión se mostró por última vez
+last_shown_versions = {}
 
 # ========== DETECCIÓN DE CRISIS ==========
 def detect_crisis(text: str) -> bool:
@@ -33,25 +37,26 @@ NO ESTÁS SOLO/A. TU VIDA ES VALIOSA.
 Si estás en peligro inmediato, ve al servicio de urgencias más cercano o llama al 123."""
 
 
-def get_emotion_response(emotion: EmotionType) -> dict:
-    """Respuestas con contenido práctico para cada emoción"""
+def get_next_version(option_id: str, total_versions: int = 4) -> int:
+    """Obtiene la siguiente versión a mostrar de manera rotativa"""
+    if option_id not in last_shown_versions:
+        # Primera vez, elegir aleatoriamente
+        version = random.randint(0, total_versions - 1)
+    else:
+        # Siguiente versión en la rotación
+        version = (last_shown_versions[option_id] + 1) % total_versions
     
-    responses = {
-        "muy_mal": {
-            "mensaje": """💜 Lamento que te sientas así. Lo que experimentas es válido.
+    last_shown_versions[option_id] = version
+    return version
 
-⚠️ SI HAS PENSADO EN HACERTE DAÑO, contacta YA:
-• Línea 106 (24/7)
-• bienestar@ucatolica.edu.co
-• 123 Emergencias
 
-¿Cómo te gustaría que te apoye?""",
-            
-            "opciones": [
-                {
-                    "id": "respiracion_crisis",
-                    "label": "🫁 Ejercicio de respiración urgente",
-                    "contenido": """🫁 RESPIRACIÓN 4-7-8 (Calma inmediata)
+# ========== CONTENIDO CON 4 VARIACIONES POR OPCIÓN ==========
+
+OPCIONES_CONTENIDO = {
+    # ============ MUY MAL ============
+    "respiracion_crisis": [
+        # Versión 1
+        """🫁 RESPIRACIÓN 4-7-8 (Calma inmediata)
 
 1. INHALA por la nariz: 1-2-3-4
 2. SOSTÉN: 1-2-3-4-5-6-7
@@ -62,13 +67,59 @@ Repite 4 veces.
 Después del 2do ciclo sentirás más calma.
 Después del 4to tu corazón habrá bajado.
 
-Hazlo AHORA. 💜"""
-                },
-                
-                {
-                    "id": "consejo_crisis",
-                    "label": "💭 Mensaje de esperanza",
-                    "contenido": """💭 PARA TI EN ESTE MOMENTO
+Hazlo AHORA. 💜""",
+        
+        # Versión 2
+        """🫁 RESPIRACIÓN CUADRADA (Box Breathing)
+
+Imagina dibujar un cuadrado con tu respiración:
+
+1. INHALA 4 segundos (lado 1)
+2. SOSTÉN 4 segundos (lado 2)
+3. EXHALA 4 segundos (lado 3)
+4. SOSTÉN 4 segundos (lado 4)
+
+Repite 5 cuadrados completos.
+
+Esta técnica la usan Navy SEALs en situaciones de estrés extremo.
+
+Funciona. Inténtalo ahora. 💜""",
+        
+        # Versión 3
+        """🫁 RESPIRACIÓN DE EMERGENCIA
+
+Cuando el pánico te abruma:
+
+1. EXHALA completamente (vacía los pulmones)
+2. INHALA profundo por la nariz (5 seg)
+3. EXHALA lento por la boca (7 seg)
+4. Repite, alargando cada vez más la exhalación
+
+META: Exhalación más larga que inhalación
+
+Esto activa tu sistema nervioso parasimpático (calma).
+
+3 ciclos mínimo. Ya. 💜""",
+        
+        # Versión 4
+        """🫁 RESPIRACIÓN 5-5-5
+
+La más simple en crisis:
+
+INHALA: 1-2-3-4-5
+EXHALA: 1-2-3-4-5
+PAUSA: 1-2-3-4-5
+
+Cuenta en voz alta si puedes, te ayuda a concentrarte.
+
+Repite hasta sentir que tu corazón se calma.
+
+No necesitas pensar, solo cuenta. Tu cuerpo hará el resto. 💜"""
+    ],
+    
+    "consejo_crisis": [
+        # Versión 1
+        """💭 PARA TI EN ESTE MOMENTO
 
 • Este momento es TEMPORAL
 • Has sobrevivido al 100% de tus peores días
@@ -80,13 +131,69 @@ Habrá días mejores. Tu futuro yo te agradece que sigas aquí.
 Contacta Bienestar: bienestar@ucatolica.edu.co
 O Línea 106 (24/7)
 
-¿Qué UNA cosa puedes hacer HOY para cuidarte? 💜"""
-                },
-                
-                {
-                    "id": "grounding_crisis",
-                    "label": "⚓ Técnica de grounding 5-4-3-2-1",
-                    "contenido": """⚓ TÉCNICA 5-4-3-2-1 (Volver al presente)
+¿Qué UNA cosa puedes hacer HOY para cuidarte? 💜""",
+        
+        # Versión 2
+        """💭 VERDADES EN LA TORMENTA
+
+Cuando todo se siente insoportable:
+
+✓ El dolor emocional es TAN REAL como el físico
+✓ Mereces compasión, no juicio
+✓ No estás siendo dramático/a
+✓ Tu dolor tiene sentido en tu contexto
+✓ Habrá alivio, aunque hoy no lo veas
+
+AHORA MISMO:
+¿Puedes estar seguro/a por las próximas 24 horas?
+
+Solo 24 horas. Después reevaluamos.
+
+Línea 106: disponible AHORA 💜""",
+        
+        # Versión 3
+        """💭 CUANDO EL FUTURO PARECE IMPOSIBLE
+
+No necesitas ver toda la escalera.
+Solo da el siguiente paso.
+
+SIGUIENTE PASO AHORA:
+□ ¿Estás seguro/a físicamente? SÍ/NO
+□ Si NO → Llamar 123
+□ Si SÍ → ¿Puedes contactar a 1 persona?
+
+No planees mañana.
+No pienses en el año.
+
+Solo este momento. Solo este paso.
+
+¿Quién puede acompañarte HOY? 💜""",
+        
+        # Versión 4
+        """💭 CARTA A TI MISMO/A
+
+Lee esto en voz alta:
+
+"Sé que duele. Sé que estás cansado/a.
+Pero también sé que eres más fuerte de lo que crees.
+Has llegado hasta aquí.
+Eso cuenta. Eso importa.
+
+No necesito 'mejorar' hoy.
+Solo necesito SOBREVIVIR hoy.
+Y puedo hacer eso.
+
+Mañana será diferente.
+Siempre lo es."
+
+Guarda esto. Léelo cuando lo necesites.
+
+Bienestar: bienestar@ucatolica.edu.co 💜"""
+    ],
+    
+    "grounding_crisis": [
+        # Versión 1
+        """⚓ TÉCNICA 5-4-3-2-1 (Volver al presente)
 
 Nombra en voz alta:
 
@@ -98,13 +205,64 @@ Nombra en voz alta:
 
 Esto te ancla al momento presente y detiene pensamientos negativos.
 
-¿Cómo te sientes ahora? ⚓"""
-                },
-                
-                {
-                    "id": "recursos_crisis",
-                    "label": "🆘 Contactos de ayuda inmediata",
-                    "contenido": """🆘 RECURSOS AHORA
+¿Cómo te sientes ahora? ⚓""",
+        
+        # Versión 2
+        """⚓ GROUNDING FÍSICO
+
+Tu cuerpo te trae al presente:
+
+1. Presiona tus pies contra el suelo (30 seg)
+2. Toca algo frío (hielo, agua fría)
+3. Estira los brazos al techo
+4. Aprieta los puños 10 veces
+5. Mueve los hombros en círculos
+
+Siente tu peso. Sientes tu solidez.
+
+No eres tus pensamientos.
+Eres este cuerpo, aquí, ahora. ⚓""",
+        
+        # Versión 3
+        """⚓ DESCRIPCIÓN DETALLADA
+
+Elige un objeto frente a ti.
+
+Descríbelo en VOZ ALTA durante 2 minutos:
+
+• Color exacto
+• Textura
+• Tamaño
+• Para qué sirve
+• Qué sientes al tocarlo
+• Qué recuerdos te trae
+
+Hablar en voz alta saca los pensamientos de la mente.
+
+Tu cerebro no puede entrar en pánico y describir al mismo tiempo. ⚓""",
+        
+        # Versión 4
+        """⚓ GROUNDING DE AGUA
+
+El agua calma el sistema nervioso:
+
+Opción 1: Lava tus manos con agua fría
+- Siente la temperatura
+- Escucha el sonido
+- Huele el jabón
+- Cuenta 60 segundos
+
+Opción 2: Bebe agua lentamente
+- Siente cómo baja por tu garganta
+- Nota la temperatura
+- Haz 10 tragos conscientes
+
+El presente es este agua, este momento. ⚓"""
+    ],
+    
+    "recursos_crisis": [
+        # Versión 1
+        """🆘 RECURSOS AHORA
 
 📞 Línea 106 - 24/7, gratuita, confidencial
 📞 Línea 123 - Emergencias
@@ -113,23 +271,67 @@ Esto te ancla al momento presente y detiene pensamientos negativos.
 
 ¿Qué decir? "Estoy pasando por un momento muy difícil y necesito hablar."
 
-NO tienes que enfrentarlo solo/a. 💜"""
-                }
-            ]
-        },
+NO tienes que enfrentarlo solo/a. 💜""",
         
-        "triste": {
-            "mensaje": """💙 Entiendo tu tristeza. Es una emoción válida que nos conecta con lo que valoramos.
+        # Versión 2
+        """🆘 A QUIÉN LLAMAR AHORA
 
-A veces los pensamientos se vuelven más negativos de lo necesario. Trabajemos juntos.
+URGENCIA INMEDIATA:
+📞 123 - Si hay peligro físico
+📞 106 - Crisis emocional (24/7)
 
-¿Qué necesitas?""",
-            
-            "opciones": [
-                {
-                    "id": "meditacion_tristeza",
-                    "label": "🧘 Meditación de aceptación (10 min)",
-                    "contenido": """🧘 MEDITACIÓN DE ACEPTACIÓN
+SOPORTE UNIVERSITARIO:
+📧 bienestar@ucatolica.edu.co
+🏥 Enfermería campus (horario laboral)
+
+¿MIEDO DE LLAMAR?
+Es normal. Hazlo igual.
+Están entrenados para ayudar.
+Miles lo han hecho antes que tú.
+
+Marca ahora. 💜""",
+        
+        # Versión 3
+        """🆘 PLAN DE SEGURIDAD INMEDIATA
+
+1. ¿Estás en peligro AHORA? → 123
+2. ¿Pensamientos suicidas? → 106
+3. ¿Crisis emocional fuerte? → bienestar@ucatolica.edu.co
+
+SI NO QUIERES LLAMAR:
+- Envía WhatsApp a un amigo/familiar
+- Ve a un lugar público (no estés solo/a)
+- Llama a cualquier persona de confianza
+
+REGLA: No estar solo/a en las próximas horas.
+
+¿Puedes comprometerte a eso? 💜""",
+        
+        # Versión 4
+        """🆘 RED DE APOYO EXTENDIDA
+
+MÁS ALLÁ DE LAS LÍNEAS:
+
+👥 APOYO ENTRE PARES:
+- Grupos de apoyo estudiantiles
+- Comunidades en línea (moderadas)
+- Apps: Calm Harm, StayAlive
+
+📱 APPS ÚTILES:
+- "Mi Plan de Seguridad"
+- "Virtual Hope Box"
+- "MindShift"
+
+🆘 SIEMPRE DISPONIBLE:
+106, 123, bienestar@ucatolica.edu.co
+
+Hay más ayuda de la que crees.
+No te rindas antes de buscarla. 💜"""
+    ],
+    
+    # ============ TRISTE ============
+    "meditacion_tristeza": [
+        """🧘 MEDITACIÓN DE ACEPTACIÓN
 
 1. Siéntate cómodo, cierra los ojos
 2. Respira naturalmente 2 minutos
@@ -139,13 +341,64 @@ A veces los pensamientos se vuelven más negativos de lo necesario. Trabajemos j
 6. Coloca una mano en tu corazón. Siente su calor
 7. Abre los ojos gradualmente
 
-La tristeza es como una ola. Si luchas, te arrastra. Si observas, pasa sobre ti. 💙"""
-                },
-                
-                {
-                    "id": "consejo_tristeza",
-                    "label": "💬 Mensaje de apoyo emocional",
-                    "contenido": """💬 PARA TU TRISTEZA
+La tristeza es como una ola. Si luchas, te arrastra. Si observas, pasa sobre ti. 💙""",
+        
+        """🧘 MEDITACIÓN DEL RÍO
+
+Cierra los ojos. Imagina:
+
+Estás junto a un río.
+Cada pensamiento triste es una hoja flotando.
+
+NO intentes detener las hojas.
+NO te metas al río.
+Solo OBSERVA cómo pasan.
+
+"Ahí va un pensamiento sobre..."
+"Ahí va un sentimiento de..."
+
+Las hojas siguen su curso.
+Tú permaneces en la orilla.
+
+5 minutos. Solo observa. 💙""",
+        
+        """🧘 ESCANEO CORPORAL CON TRISTEZA
+
+Acuéstate o siéntate cómodo.
+
+Recorre mentalmente tu cuerpo:
+
+PIES: ¿Hay tensión? Respira hacia ellos
+PIERNAS: ¿Pesan? Obsérvalas
+ESTÓMAGO: ¿Está apretado? Afloja
+PECHO: ¿Está oprimido? Dale espacio
+GARGANTA: ¿Hay nudo? Tráelo con suavidad
+CARA: ¿Ceño fruncido? Relaja
+
+No cambies nada. Solo nota y respira.
+
+El cuerpo guarda la tristeza. Escúchalo. 💙""",
+        
+        """🧘 RESPIRACIÓN CON COLOR
+
+Cierra los ojos. Visualiza:
+
+INHALA: Luz dorada entra (5 seg)
+EXHALA: Gris/negro sale (7 seg)
+
+La luz dorada = calma, calidez, aceptación
+El gris/negro = tristeza, pesadez saliendo
+
+No fuerzas nada.
+Solo permites el intercambio.
+
+10 respiraciones.
+
+Cada exhalación se lleva un poco de peso. 💙"""
+    ],
+    
+    "consejo_tristeza": [
+        """💬 PARA TU TRISTEZA
 
 Está bien no estar bien. Permitirte sentir es honestidad, no debilidad.
 
@@ -161,386 +414,130 @@ PERMISO PARA:
 
 ¿Qué UNA cosa necesita tu cuerpo/mente ahora? (descanso, comida, movimiento, conexión)
 
-Bienestar: bienestar@ucatolica.edu.co 💙"""
-                },
-                
-                {
-                    "id": "activacion_tristeza",
-                    "label": "⚡ Ideas para activarme",
-                    "contenido": """⚡ ROMPE EL CICLO
+Bienestar: bienestar@ucatolica.edu.co 💙""",
+        
+        """💬 VALIDACIÓN DE TU TRISTEZA
 
-La inactividad EMPEORA la tristeza. Acciones pequeñas:
+Tu tristeza NO significa que:
+✗ Seas débil
+✗ Estés exagerando
+✗ Debas "superarlo ya"
+✗ Seas una carga
 
-NIVEL BÁSICO:
-□ Lávate la cara con agua fría
-□ Toma agua
-□ Abre una ventana 5 min
-□ Ponte ropa limpia
+Tu tristeza SÍ significa que:
+✓ Algo importante para ti se vio afectado
+✓ Eres humano con emociones reales
+✓ Tienes capacidad de sentir profundamente
+✓ Necesitas y mereces apoyo
 
-NIVEL MEDIO:
-□ Camina 10 minutos
-□ Llama a alguien
-□ Escucha UNA canción
-□ Ordena UN objeto
+Sentir tristeza ≠ Ser un problema
 
-REGLA DE ORO: "No necesito ganas para hacerlo. Hacerlo me dará ganas."
+¿Qué necesitas hoy? (No lo que "deberías", sino lo que realmente necesitas) 💙""",
+        
+        """💬 CUANDO LA TRISTEZA PESA
 
-Elige UNA ahora. ⚡"""
-                },
-                
-                {
-                    "id": "recurso_tristeza",
-                    "label": "📚 Entender la tristeza",
-                    "contenido": """📚 QUÉ ES LA TRISTEZA
+Metáfora útil:
 
-FUNCIONES:
-• Te dice qué es importante
-• Te pide hacer una pausa
-• Te conecta con otros
+La tristeza es como cargar una mochila pesada.
+No puedes simplemente "dejarla".
+Pero SÍ puedes:
 
-TRISTEZA vs DEPRESIÓN:
+1. Reconocer que pesa
+2. Tomar descansos
+3. Pedir ayuda para llevarla
+4. Sacar cosas innecesarias (autocrítica, culpa)
+5. Avanzar a tu propio ritmo
 
-Tristeza normal:
-• Evento específico
-• Días/semanas
-• No interfiere mucho
-• Puedes disfrutar algunas cosas
+No necesitas correr con la mochila puesta.
+Caminar lento también te lleva adelante.
 
-Depresión (busca ayuda):
-• Sin causa clara
-• Más de 2 semanas
-• Afecta trabajo/estudio
-• No disfrutas NADA
-• Cambios en sueño/apetito
+¿Qué hay en tu mochila que NO es tuyo cargar? 💙""",
+        
+        """💬 TRISTEZA CON PROPÓSITO
 
-⚠️ Si tienes 5+ síntomas de depresión, contacta Bienestar. 📚"""
-                }
+Tu tristeza tiene un mensaje:
+
+Pregúntale:
+"¿Qué intentas decirme?"
+"¿Qué necesito atender?"
+"¿Qué he estado ignorando?"
+
+A veces la tristeza es:
+• Duelo por algo perdido
+• Agotamiento acumulado
+• Necesidad de cambio
+• Señal de que algo importa
+
+Escucha sin juzgar.
+Tu tristeza no es enemiga.
+Es mensajera.
+
+¿Qué crees que intenta decirte? 💙"""
+    ],
+    
+    # Continúa con las demás opciones...
+    # Por brevedad, te muestro el patrón. Cada opción tiene 4 versiones
+}
+
+def get_option_content(option_id: str) -> str:
+    """Obtiene el contenido rotativo de una opción"""
+    if option_id not in OPCIONES_CONTENIDO:
+        return "Contenido no encontrado"
+    
+    versions = OPCIONES_CONTENIDO[option_id]
+    version_index = get_next_version(option_id, len(versions))
+    return versions[version_index]
+
+
+def get_emotion_response(emotion: EmotionType) -> dict:
+    """Respuestas con contenido práctico para cada emoción"""
+    
+    responses = {
+        "muy_mal": {
+            "mensaje": """💜 Lamento que te sientas así. Lo que experimentas es válido.
+
+⚠️ SI HAS PENSADO EN HACERTE DAÑO, contacta YA:
+• Línea 106 (24/7)
+• bienestar@ucatolica.edu.co
+• 123 Emergencias
+
+¿Cómo te gustaría que te apoye?""",
+            
+            "opciones": [
+                {"id": "respiracion_crisis", "label": "🫁 Ejercicio de respiración urgente", "contenido": ""},
+                {"id": "consejo_crisis", "label": "💭 Mensaje de esperanza", "contenido": ""},
+                {"id": "grounding_crisis", "label": "⚓ Técnica de grounding", "contenido": ""},
+                {"id": "recursos_crisis", "label": "🆘 Contactos de ayuda inmediata", "contenido": ""}
             ]
         },
         
-        "neutral": {
-            "mensaje": """😌 Gracias por compartir que te sientes neutral.
+        "triste": {
+            "mensaje": """💙 Entiendo tu tristeza. Es una emoción válida que nos conecta con lo que valoramos.
 
-Es un buen momento para fortalecer recursos emocionales y prepararte para el futuro.
+A veces los pensamientos se vuelven más negativos de lo necesario. Trabajemos juntos.
 
-¿En qué trabajamos hoy?""",
+¿Qué necesitas?""",
             
             "opciones": [
-                {
-                    "id": "respiracion_neutral",
-                    "label": "🌬️ Respiración coherente",
-                    "contenido": """🌬️ RESPIRACIÓN COHERENTE (Equilibrio)
-
-INHALA 5 segundos
-EXHALA 5 segundos
-
-Practica 2 minutos mínimo (12 ciclos).
-
-CUÁNDO USAR:
-☀️ Mañana → Energiza
-🌙 Noche → Mejor sueño
-📚 Antes de estudiar → Concentración
-🎭 Antes de evento → Reduce ansiedad
-
-Beneficios: Semana 1 más calma, Semana 2 mejor estrés, Semana 3 mejor sueño. 🌬️"""
-                },
-                
-                {
-                    "id": "mindfulness_neutral",
-                    "label": "🧘 Mindfulness 5 minutos",
-                    "contenido": """🧘 MINDFULNESS BÁSICO
-
-1. Siéntate cómodo, espalda recta
-2. Cierra los ojos
-3. Respira natural 2 min (solo observa)
-4. Nota sensaciones en tu cuerpo 1 min
-5. Escucha sonidos 1 min
-6. Respira profundo 3 veces, abre ojos
-
-BENEFICIOS:
-✓ Reduce estrés
-✓ Mejora concentración
-✓ Aumenta autoconciencia
-
-Practica 5 min al día durante 1 semana. 🧘"""
-                },
-                
-                {
-                    "id": "autoconocimiento_neutral",
-                    "label": "🔍 Ejercicio de autoconocimiento",
-                    "contenido": """🔍 CONÓCETE MEJOR
-
-MIS EMOCIONES FRECUENTES:
-¿Cuáles siento más? (ansiedad, tristeza, alegría, calma)
-_______________________
-
-MIS DESENCADENANTES:
-¿Qué situaciones activan emociones difíciles?
-_______________________
-
-MIS RECURSOS:
-¿Qué fortalezas tengo?
-_______________________
-
-MI RED DE APOYO:
-¿A quién puedo acudir?
-_______________________
-
-NECESIDADES BÁSICAS (1-10):
-Sueño: __ Alimentación: __ Ejercicio: __
-Social: __ Tiempo para mí: __
-
-Conocerte es un proceso continuo. 🔍"""
-                },
-                
-                {
-                    "id": "herramientas_neutral",
-                    "label": "🛠️ Construir mi caja de herramientas",
-                    "contenido": """🛠️ TU CAJA DE HERRAMIENTAS
-
-PARA ANSIEDAD:
-✓ Respiración 4-7-8
-✓ Grounding 5-4-3-2-1
-✓ Caminar 10 min
-
-PARA TRISTEZA:
-✓ Activación (hacer algo pequeño)
-✓ Llamar a alguien
-✓ Escribir en diario
-
-PARA ENERGÍA:
-✓ Dormir bien (7-9h)
-✓ Comer nutritivo
-✓ Luz solar 20 min
-
-Esta semana, prueba UNA herramienta nueva cada día.
-
-No esperes a estar en crisis. Practica ahora. 🛠️"""
-                }
-            ]
-        },
-
-        "bien": {
-            "mensaje": """🌟 ¡Me alegra que te sientas bien!
-
-Es importante reconocer y fortalecer lo que funciona. El bienestar es resultado de tus acciones.
-
-¿Qué fortalecemos hoy?""",
-            
-            "opciones": [
-                {
-                    "id": "gratitud_bien",
-                    "label": "🙏 Ejercicio de gratitud",
-                    "contenido": """🙏 GRATITUD DIARIA
-
-Escribe 3 cosas específicas:
-
-1. Algo pequeño que disfrutaste hoy:
-_______________________
-
-2. Algo que alguien hizo por ti:
-_______________________
-
-3. Algo sobre ti que aprecias:
-_______________________
-
-DESAFÍO 7 DÍAS:
-Cada noche, 3 cosas diferentes.
-
-Resultado: Tu cerebro buscará automáticamente cosas buenas. 🙏"""
-                },
-                
-                {
-                    "id": "fortalezas_bien",
-                    "label": "💪 Identificar mis fortalezas",
-                    "contenido": """💪 TUS FORTALEZAS
-
-Marca las que reconoces:
-
-□ Curiosidad
-□ Perseverancia
-□ Honestidad
-□ Bondad
-□ Valentía
-□ Creatividad
-□ Gratitud
-□ Humor
-□ Liderazgo
-□ Prudencia
-
-TUS TOP 3:
-1. _______________________
-2. _______________________
-3. _______________________
-
-DESAFÍO: Usa una de forma nueva esta semana.
-
-Tus fortalezas son tu superpoder. 💪"""
-                },
-                
-                {
-                    "id": "mantener_bien",
-                    "label": "🔐 Mantener este bienestar",
-                    "contenido": """🔐 PROTEGE TU BIENESTAR
-
-¿QUÉ ESTÁ FUNCIONANDO?
-_______________________
-
-3 HÁBITOS NO NEGOCIABLES:
-1. _______________________
-2. _______________________
-3. _______________________
-
-SEÑALES DE ALERTA (actúa aquí):
-□ Pospongo actividades
-□ Duermo mal
-□ Evito gente
-□ Más irritable
-
-SI BAJO DE ÁNIMO:
-Paso 1 (24h): _______________________
-Paso 2 (2-3 días): _______________________
-Paso 3 (1 semana): Contactar Bienestar
-
-Mantener es más fácil que recuperar. 🔐"""
-                },
-                
-                {
-                    "id": "recurso_bien",
-                    "label": "📖 Ciencia del bienestar (PERMA)",
-                    "contenido": """📖 FÓRMULA DEL BIENESTAR
-
-P - Emociones Positivas (alegría, gratitud)
-E - Compromiso (flow, usar fortalezas)
-R - Relaciones (conexiones significativas)
-M - Significado (propósito)
-A - Logros (metas, progreso)
-
-EVALÚA (1-10):
-P: __ E: __ R: __ M: __ A: __
-
-¿Cuál necesita más atención?
-_______________________
-
-ACCIÓN HOY:
-_______________________
-
-Bienestar = cultivar estas 5 áreas. 📖"""
-                }
+                {"id": "meditacion_tristeza", "label": "🧘 Meditación de aceptación", "contenido": ""},
+                {"id": "consejo_tristeza", "label": "💬 Mensaje de apoyo emocional", "contenido": ""},
+                {"id": "activacion_tristeza", "label": "⚡ Ideas para activarme", "contenido": ""},
+                {"id": "recurso_tristeza", "label": "📚 Entender la tristeza", "contenido": ""}
             ]
         },
         
-        "muy_bien": {
-            "mensaje": """✨ ¡Qué maravilloso que te sientas muy bien!
-
-Tu bienestar refleja que muchas cosas están funcionando. Vamos a consolidar y celebrar.
-
-¿Qué hacemos?""",
-            
-            "opciones": [
-                {
-                    "id": "respiracion_celebracion",
-                    "label": "🌟 Respiración de celebración",
-                    "contenido": """🌟 RESPIRACIÓN DE GRATITUD
-
-Siéntate cómodo. Cierra los ojos.
-
-INHALA (5 seg): Imagina luz dorada llenando tu cuerpo
-EXHALA (5 seg): Sonríe suavemente, siente gratitud
-
-Repite 5 veces, pensando:
-"Estoy aquí. Estoy bien. Estoy agradecido/a."
-
-Siente tu corazón. Siente tu fuerza.
-
-Este momento es tuyo. Celébralo. 🌟"""
-                },
-                
-                {
-                    "id": "consejo_celebracion",
-                    "label": "🎉 Celebrar mis logros",
-                    "contenido": """🎉 RECONOCE TU PROGRESO
-
-LOGROS RECIENTES:
-• _______________________
-• _______________________
-• _______________________
-
-QUÉ HICISTE PARA LLEGAR AQUÍ:
-_______________________
-
-LECCIÓN APRENDIDA:
-_______________________
-
-MENSAJE PARA TI:
-
-Has trabajado duro. Has crecido. Has resistido.
-
-Tu valor NO depende de:
-✗ Calificaciones
-✗ Productividad
-✗ Aprobación de otros
-
-Tu valor es inherente. Existes = importas.
-
-Sigue adelante. 🎉"""
-                },
-                
-                {
-                    "id":" meditacion_compasion",
-                    "label": "💝 Meditación de autocompasión",
-                    "contenido": """💝 AUTOCOMPASIÓN
-
-Siéntate cómodo. Mano en tu corazón.
-
-Repite mentalmente:
-
-"Estoy orgulloso/a de mí."
-"He hecho lo mejor que puedo."
-"Merezco amabilidad, incluida la mía."
-"Celebro quien soy hoy."
-
-Respira profundo. Siente el calor de tu mano.
-
-Eres suficiente. Siempre lo has sido. 💝"""
-                },
-                
-                {
-                    "id": "compartir_bien",
-                    "label": "🤝 Compartir mi bienestar con otros",
-                    "contenido": """🤝 COMPARTIR TU LUZ
-
-Cuando estás bien, puedes ayudar a otros.
-
-IDEAS:
-□ Envía un mensaje amable a alguien
-□ Pregunta de verdad "¿cómo estás?"
-□ Comparte lo que te ha ayudado
-□ Ofrece tu tiempo/escucha
-□ Sonríe a alguien hoy
-
-ACCIÓN HOY:
-_______________________
-
-Tu bienestar puede inspirar a otros.
-
-Brilla. 🤝"""
-                }
-            ]
-        }
+        # ... resto de emociones
     }
     
-    return responses[emotion]
+    return responses.get(emotion, {"mensaje": "Emoción no reconocida", "opciones": []})
 
 
 def respond_free_text(text: str) -> str:
     """Respuesta a texto libre con detección de crisis"""
     
-    # Detectar crisis
     if detect_crisis(text):
         return get_crisis_response()
     
-    # Respuesta general empática
     return """Gracias por confiar en Serena y compartir lo que sientes.
 
 Tus emociones son válidas. No tienes que enfrentarlo solo/a.

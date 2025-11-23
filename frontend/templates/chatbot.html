@@ -222,7 +222,6 @@
       font-weight: 600;
     }
 
-    /* Botones de opciones */
     .option-buttons {
       display: flex;
       flex-direction: column;
@@ -246,6 +245,44 @@
     .option-btn:hover {
       transform: translateX(5px);
       box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+
+    .continue-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .continue-btn {
+      padding: 10px 20px;
+      border: 2px solid;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      background: white;
+    }
+
+    .continue-btn.more-help {
+      color: #8b5cf6;
+      border-color: #8b5cf6;
+    }
+
+    .continue-btn.more-help:hover {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    .continue-btn.finish {
+      color: #10b981;
+      border-color: #10b981;
+    }
+
+    .continue-btn.finish:hover {
+      background: #10b981;
+      color: white;
     }
 
     .input-area {
@@ -294,6 +331,8 @@
       .emotion-buttons { flex-direction: column; }
       .emotion-btn { width: 100%; justify-content: center; }
       .message-content { max-width: 90%; }
+      .continue-buttons { flex-direction: column; }
+      .continue-btn { width: 100%; text-align: center; }
     }
   </style>
 </head>
@@ -313,9 +352,7 @@
     <div class="intro-card">
       <h2>🤗 Bienvenido/a al espacio de apoyo emocional</h2>
       <p>
-        Soy Serena, tu asistente de apoyo emocional. Estoy aquí para escucharte sin juzgarte, 
-        validar tus emociones y ayudarte a explorar estrategias basadas en psicología 
-        cognitivo-conductual.
+        Soy Serena, tu asistente de apoyo emocional. Cada vez que uses una técnica, te daré una versión diferente para que siempre tengas contenido fresco y útil.
       </p>
       <div class="disclaimer">
         <strong>⚠️ Importante:</strong> Soy una herramienta de apoyo inicial, no reemplazo 
@@ -368,9 +405,9 @@ En este espacio seguro y confidencial, puedes expresar lo que sientes sin miedo 
     const chatMessages = document.getElementById("chatMessages");
     const chatInput = document.getElementById("chatInput");
     const chatSend = document.getElementById("chatSend");
+    let currentEmotion = null;
 
-    // Función para agregar mensaje
-    function addMessage(text, sender, options = null) {
+    function addMessage(text, sender, options = null, showContinueButtons = false) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${sender}`;
       
@@ -385,7 +422,6 @@ En este espacio seguro y confidencial, puedes expresar lo que sientes sin miedo 
       messageDiv.appendChild(senderDiv);
       messageDiv.appendChild(contentDiv);
       
-      // Si hay opciones, agregar botones
       if (options && options.length > 0) {
         const optionsDiv = document.createElement('div');
         optionsDiv.className = 'option-buttons';
@@ -394,63 +430,161 @@ En este espacio seguro y confidencial, puedes expresar lo que sientes sin miedo 
           const btn = document.createElement('button');
           btn.className = 'option-btn';
           btn.textContent = option.label;
-          btn.onclick = () => showOptionContent(option);
+          // ✨ CAMBIO IMPORTANTE: Ahora llamamos a la API para obtener contenido rotativo
+          btn.onclick = () => showOptionContentRotative(option);
           optionsDiv.appendChild(btn);
         });
         
         contentDiv.appendChild(optionsDiv);
       }
       
+      if (showContinueButtons) {
+        const continueDiv = document.createElement('div');
+        continueDiv.className = 'continue-buttons';
+        
+        const moreHelpBtn = document.createElement('button');
+        moreHelpBtn.className = 'continue-btn more-help';
+        moreHelpBtn.textContent = '🔄 Quiero más ayuda';
+        moreHelpBtn.onclick = () => showMoreHelp();
+        
+        const finishBtn = document.createElement('button');
+        finishBtn.className = 'continue-btn finish';
+        finishBtn.textContent = '✅ Finalizar conversación';
+        finishBtn.onclick = () => finishChat();
+        
+        continueDiv.appendChild(moreHelpBtn);
+        continueDiv.appendChild(finishBtn);
+        contentDiv.appendChild(continueDiv);
+      }
+      
       chatMessages.appendChild(messageDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Función para mostrar contenido de opción
-    function showOptionContent(option) {
+    // ✨ NUEVA FUNCIÓN: Obtiene contenido rotativo del backend
+    async function showOptionContentRotative(option) {
       addMessage(`Seleccioné: ${option.label}`, 'user');
       
+      try {
+        // Llamar al endpoint que devuelve contenido rotativo
+        const response = await fetch('/api/v1/chatbot/option-detail', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ option_id: option.id })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          setTimeout(() => {
+            addMessage(data.contenido, 'serena');
+            
+            setTimeout(() => {
+              addMessage('¿Qué te gustaría hacer ahora?', 'serena', null, true);
+            }, 800);
+          }, 500);
+        } else {
+          console.error('Error al obtener contenido');
+          addMessage('Hubo un error al cargar el contenido. Por favor intenta de nuevo.', 'serena');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        addMessage('Hubo un error al cargar el contenido. Por favor intenta de nuevo.', 'serena');
+      }
+    }
+
+    function showMoreHelp() {
+      addMessage('Quiero más ayuda', 'user');
+      
       setTimeout(() => {
-        addMessage(option.contenido, 'serena');
+        if (currentEmotion) {
+          addMessage('Perfecto. Aquí tienes más opciones de apoyo basadas en cómo te sientes:', 'serena');
+          
+          setTimeout(async () => {
+            try {
+              const response = await fetch('/api/v1/chatbot/emotion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ emotion: currentEmotion })
+              });
+              
+              if (response.ok) {
+                const data = await response.json();
+                addMessage(data.mensaje, 'serena', data.opciones);
+              } else {
+                addMessage('Hubo un error al cargar las opciones. Por favor intenta de nuevo.', 'serena');
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              addMessage('Hubo un error al cargar las opciones. Por favor intenta de nuevo.', 'serena');
+            }
+          }, 500);
+        } else {
+          addMessage('Por favor, selecciona primero cómo te sientes usando los botones de arriba, o escríbeme directamente.', 'serena');
+        }
       }, 500);
     }
 
-    // Manejar clic en botones de emoción
+    function finishChat() {
+      addMessage('Finalizar conversación', 'user');
+      
+      setTimeout(() => {
+        addMessage(`Gracias por confiar en mí y compartir este espacio. 💜
+
+Recuerda:
+✅ Tus emociones son válidas
+✅ No estás solo/a
+✅ Siempre puedes volver cuando lo necesites
+
+RECURSOS DISPONIBLES 24/7:
+📞 Línea 106 - Línea de la vida
+📞 Línea 123 - Emergencias
+📧 bienestar@ucatolica.edu.co
+
+Si en algún momento necesitas ayuda urgente, no dudes en contactarlos.
+
+Cuídate mucho. Aquí estaré cuando me necesites. 🌟`, 'serena');
+        
+        currentEmotion = null;
+      }, 500);
+    }
+
     emotionButtons.forEach(btn => {
       btn.addEventListener("click", async () => {
         const emotion = btn.dataset.emotion;
         const emotionText = btn.textContent.trim();
+        currentEmotion = emotion;
         
         addMessage(`Seleccioné: ${emotionText}`, 'user');
         
         try {
-          // ✅ Enviar la emoción como string en el body
           const response = await fetch('/api/v1/chatbot/emotion', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(`"${emotion}"`)  // Formato: "muy_mal"
+            headers: { 
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ emotion: emotion })
           });
           
           if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error del servidor:', errorText);
-            throw new Error('Error en la respuesta del servidor');
+            throw new Error(`Error ${response.status}`);
           }
           
           const data = await response.json();
           
-          console.log('✅ Respuesta recibida:', data);
-          
-          // Agregar mensaje con opciones
-          addMessage(data.mensaje, 'serena', data.opciones);
+          if (data.error) {
+            addMessage(`Error: ${data.error}`, 'serena');
+          } else {
+            addMessage(data.mensaje, 'serena', data.opciones);
+          }
           
         } catch (error) {
-          console.error('❌ Error completo:', error);
+          console.error('Error:', error);
           addMessage('Hubo un error al procesar tu solicitud. Por favor intenta de nuevo.', 'serena');
         }
       });
     });
 
-    // Función para enviar mensaje
     async function sendMessage() {
       const text = chatInput.value.trim();
       if (!text) return;
@@ -469,13 +603,16 @@ En este espacio seguro y confidencial, puedes expresar lo que sientes sin miedo 
         const data = await response.json();
         addMessage(data.reply, 'serena');
         
+        setTimeout(() => {
+          addMessage('¿Qué te gustaría hacer ahora?', 'serena', null, true);
+        }, 800);
+        
       } catch (error) {
         console.error('Error:', error);
         addMessage('Hubo un error al procesar tu mensaje. Por favor intenta de nuevo.', 'serena');
       }
     }
 
-    // Event listeners
     chatSend.addEventListener("click", sendMessage);
     
     chatInput.addEventListener("keypress", (e) => {
@@ -485,7 +622,6 @@ En este espacio seguro y confidencial, puedes expresar lo que sientes sin miedo 
       }
     });
 
-    // Auto-resize textarea
     chatInput.addEventListener('input', function() {
       this.style.height = 'auto';
       this.style.height = Math.min(this.scrollHeight, 120) + 'px';
